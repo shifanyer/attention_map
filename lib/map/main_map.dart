@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:attention_map/db_methods/db_main_methods.dart';
 import 'package:attention_map/enums/marker_type.dart';
+import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:geocoder/geocoder.dart';
@@ -11,6 +12,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'bottom_choose_list.dart';
 
 class MainMap extends StatefulWidget {
+  final LatLng startCameraPosition;
+  final List<MarkerInfo> markersList;
+
+  const MainMap({Key key, this.startCameraPosition, @required this.markersList}) : super(key: key);
+
   @override
   _MainMapState createState() => _MainMapState();
 }
@@ -30,17 +36,31 @@ class _MainMapState extends State<MainMap> {
 
   @override
   void initState() {
+    if (widget?.startCameraPosition != null) {
+      initialCameraPosition = widget.startCameraPosition;
+    }
     // TODO: implement initState
     super.initState();
     getLoc();
   }
 
   // создание меток
-  Future<bool> customMarkersMaker() async {
+  Future<bool> customMarkersMaker(List<MarkerInfo> markersList) async {
     customMarkers[MarkerType.camera] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/camera_marker.png');
     customMarkers[MarkerType.dps] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/DPS_marker.png');
     customMarkers[MarkerType.monument] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/monument_marker.png');
     customMarkers[MarkerType.other] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/destination_map_marker.png');
+    for (var dbMarker in markersList){
+      var dbMarkerId = dbMarker.getMarkerId();
+      markers[dbMarkerId] = Marker(
+        icon: customMarkers[dbMarker.markerType],
+        markerId: dbMarkerId,
+        position: dbMarker.coordinates,
+        infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
+        onTap: () {
+        },
+      );
+    }
     return true;
   }
 
@@ -59,7 +79,7 @@ class _MainMapState extends State<MainMap> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: customMarkersMaker(),
+        future: customMarkersMaker(widget.markersList),
         builder: (context, customMarkersMakerSnapshot) {
           return Scaffold(
             body: (customMarkersMakerSnapshot?.data == true)
@@ -256,22 +276,23 @@ class _MainMapState extends State<MainMap> {
       icon: customMarkers[markerType],
       markerId: markerId,
       position: markerCoordinates,
-      infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+      infoWindow: InfoWindow(title: markerId.value, snippet: '*'),
       onTap: () {
       },
     );
 
     DbMainMethods.uploadPoint(markerCoordinates, markerType, ['-555605']);
-    var dbMarkers = await DbMainMethods.downloadPoints(['-555605']);
+    var dbMarkers = await DbMainMethods.downloadPointsList(['-555605']);
 
     setState(() {
+      markers = {};
       for (var dbMarker in dbMarkers){
         var dbMarkerId = dbMarker.getMarkerId();
         markers[dbMarkerId] = Marker(
           icon: customMarkers[dbMarker.markerType],
           markerId: dbMarkerId,
           position: dbMarker.coordinates,
-          infoWindow: InfoWindow(title: markerIdVal, snippet: '*'),
+          infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
           onTap: () {
           },
         );

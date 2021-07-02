@@ -22,7 +22,7 @@ class DbMainMethods {
     }
   }
 
-  static Future<List<MarkerInfo>> downloadPoints(List<String> centers) async {
+  static Future<List<MarkerInfo>> downloadPointsList(List<String> centers) async {
     var markers = <MarkerInfo>[];
     for (var center in centers) {
       DatabaseReference camerasDatabaseReference = FirebaseDatabase.instance.reference().child(center);
@@ -43,11 +43,5 @@ class DbMainMethods {
       }
     }
     return markers;
-  }
-
-  static Future<Map> downloadPerson(String personID) async {
-    DatabaseReference person = FirebaseDatabase.instance.reference().child(personID).child('person_information');
-    var info = await person.once();
-    return info.value;
   }
 }
