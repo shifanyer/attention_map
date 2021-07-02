@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "588266659514",
+    "project_id": "attention-map",
+    "storage_bucket": "attention-map.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:588266659514:android:75b3598449db57ec422c83",
+        "android_client_info": {
+          "package_name": "com.example.attention_map"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "588266659514-clvud18vh34f37artq9uk822burprpni.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.attention_map",
+            "certificate_hash": "ff5c713dc3bb9a7e65647805bdbeaaf113fa6287"
+          }
+        },
+        {
+          "client_id": "588266659514-dta9de2b2tj2nee6t04oamv2vu6r9h4v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBf2NV5EUDRwhpqJHPfz2o04fHX8ZsyyL4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "588266659514-dta9de2b2tj2nee6t04oamv2vu6r9h4v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
