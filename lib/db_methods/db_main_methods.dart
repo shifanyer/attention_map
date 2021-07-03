@@ -27,8 +27,11 @@ class DbMainMethods {
     for (var center in centers) {
       DatabaseReference camerasDatabaseReference = FirebaseDatabase.instance.reference().child(center);
       var radiusSnapshot = await camerasDatabaseReference.once();
+      if (radiusSnapshot?.value == null){
+        return [];
+      }
       for (var markerType in MarkerType.values) {
-        var typedMap = radiusSnapshot.value[EnumMethods.enumToString(markerType)];
+        var typedMap = radiusSnapshot?.value[EnumMethods.enumToString(markerType)] ?? {};
         for (var point in typedMap?.values ?? []) {
           var pointCoordinates = LatLng(point['coordX'], point['coordY']);
           var confirmsNumber = point['confirms'];

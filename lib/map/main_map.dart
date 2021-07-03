@@ -27,6 +27,8 @@ class _MainMapState extends State<MainMap> {
   Map<MarkerType, BitmapDescriptor> customMarkers = {};
   String _address, _dateTime;
   GoogleMapController mapController;
+  var centersSet = <String>{};
+  bool firstLoad = true;
 
   // Marker marker;
   Location location = Location();
@@ -40,26 +42,33 @@ class _MainMapState extends State<MainMap> {
       initialCameraPosition = widget.startCameraPosition;
     }
     // TODO: implement initState
-    super.initState();
     getLoc();
+    super.initState();
   }
 
   // создание меток
   Future<bool> customMarkersMaker(List<MarkerInfo> markersList) async {
-    customMarkers[MarkerType.camera] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/camera_marker.png');
-    customMarkers[MarkerType.dps] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/DPS_marker.png');
-    customMarkers[MarkerType.monument] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/monument_marker.png');
-    customMarkers[MarkerType.other] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/destination_map_marker.png');
-    for (var dbMarker in markersList){
-      var dbMarkerId = dbMarker.getMarkerId();
-      markers[dbMarkerId] = Marker(
-        icon: customMarkers[dbMarker.markerType],
-        markerId: dbMarkerId,
-        position: dbMarker.coordinates,
-        infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
-        onTap: () {
-        },
-      );
+    if (firstLoad) {
+      // заготовка стандартных маркеров
+      customMarkers[MarkerType.camera] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/camera_marker.png');
+      customMarkers[MarkerType.dps] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/DPS_marker.png');
+      customMarkers[MarkerType.monument] =
+      await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/monument_marker.png');
+      customMarkers[MarkerType.other] =
+      await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/destination_map_marker.png');
+
+      //ДОБАВЛЕНИЕ ТОЧЕК В map точек
+      for (var dbMarker in markersList) {
+        var dbMarkerId = dbMarker.getMarkerId();
+        markers[dbMarkerId] = Marker(
+          icon: customMarkers[dbMarker.markerType],
+          markerId: dbMarkerId,
+          position: dbMarker.coordinates,
+          infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
+          onTap: () {},
+        );
+      }
+      firstLoad = false;
     }
     return true;
   }
@@ -67,12 +76,21 @@ class _MainMapState extends State<MainMap> {
   void _onMapCreated(GoogleMapController _cntlr) {
     // _controller = _controller;
     location.onLocationChanged.listen((l) {
-      if (_controller != null)
+      if (_controller != null) {
         _controller.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: LatLng(l.latitude, l.longitude), zoom: 15),
           ),
         );
+        /*
+        Set<String> updatedCentersSet = getCentersSet(l);
+        if (!centersSet.containsAll(updatedCentersSet)) {
+          centersSet = updatedCentersSet;
+          updateMarkers();
+        }
+
+         */
+      }
     });
   }
 
@@ -93,23 +111,7 @@ class _MainMapState extends State<MainMap> {
                       child: Container(
                         color: Colors.blueGrey.withOpacity(.8),
                         child: Center(
-                          child:
-                          /*
-                          Container(
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width,
-                            child: GoogleMap(
-                              initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: 15),
-                              mapType: MapType.normal,
-                              onMapCreated: _onMapCreated,
-                              myLocationEnabled: true,
-                              markers: markers.values.toSet(),
-                            ),
-                          ),
-                          */
-
-
-                          Column(
+                          child: Column(
                             children: [
                               //карта
                               Container(
@@ -123,7 +125,6 @@ class _MainMapState extends State<MainMap> {
                                   markers: markers.values.toSet(),
                                 ),
                               ),
-
 
                               SizedBox(
                                 height: 3,
@@ -158,10 +159,8 @@ class _MainMapState extends State<MainMap> {
                               SizedBox(
                                 height: 3,
                               ),
-
                             ],
                           ),
-
                         ),
                       ),
                     ),
@@ -198,21 +197,63 @@ class _MainMapState extends State<MainMap> {
 
     _currentPosition = await location.getLocation();
     initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
-    location.onLocationChanged.listen((LocationData currentLocation) {
+    location.onLocationChanged.listen((LocationData currentLocation) async {
+      Set<String> updatedCentersSet = getCentersSet(currentLocation);
+      print(centersSet);
+      print(updatedCentersSet);
+      if (!centersSet.containsAll(updatedCentersSet)) {
+        print('HERE');
+        centersSet = updatedCentersSet;
+        await updateMarkers();
+      }
       setState(() {
         _currentPosition = currentLocation;
         initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
 
         DateTime now = DateTime.now();
         _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
+
+
+        /*
         _getAddress(_currentPosition.latitude, _currentPosition.longitude).then((value) {
           setState(() {
             // _address = "${value.first.addressLine}";
             _address = "value.first.addressLine";
           });
         });
+        */
       });
     });
+  }
+
+  Set<String> getCentersSet(LocationData currentLocation) {
+    var lat10 = (currentLocation.latitude * 10).ceil();
+    var lon10 = (currentLocation.longitude * 10).ceil();
+
+    var lat10div5 = (lat10 ~/ 5) * 5;
+    var lon10div5 = (lon10 ~/ 5) * 5;
+
+    var centersList = [
+      LatLng(lat10div5 / 10.0 - 0.5, lon10div5 / 10.0 - 0.5),
+      LatLng(lat10div5 / 10.0 - 0.5, lon10div5 / 10.0 - 0.0),
+      LatLng(lat10div5 / 10.0 - 0.5, lon10div5 / 10.0 + 0.5),
+      LatLng(lat10div5 / 10.0 - 0.0, lon10div5 / 10.0 - 0.5),
+      LatLng(lat10div5 / 10.0 - 0.0, lon10div5 / 10.0 - 0.0),
+      LatLng(lat10div5 / 10.0 - 0.0, lon10div5 / 10.0 + 0.5),
+      LatLng(lat10div5 / 10.0 + 0.5, lon10div5 / 10.0 - 0.5),
+      LatLng(lat10div5 / 10.0 + 0.5, lon10div5 / 10.0 - 0.0),
+      LatLng(lat10div5 / 10.0 + 0.5, lon10div5 / 10.0 + 0.5)
+    ];
+
+    var resSet = <String>{};
+
+    for (var center in centersList) {
+      if (((center.latitude - currentLocation.latitude) <= 0.51) && ((center.longitude - currentLocation.longitude) <= 0.51)) {
+        resSet.add(((center.latitude * 10).toString()).split('.').first + ((center.longitude * 10).toString()).split('.').first);
+      }
+    }
+
+    return resSet;
   }
 
   // определение адреса
@@ -221,6 +262,30 @@ class _MainMapState extends State<MainMap> {
     // List<Address> add = await Geocoder.local.findAddressesFromCoordinates(coordinates);
     // return add;
     return null;
+  }
+
+  // загрузка маркеров из db
+  Future<void> updateMarkers() async {
+    var dbMarkers = await DbMainMethods.downloadPointsList(centersSet.toList());
+
+    markers = {};
+    for (var dbMarker in dbMarkers) {
+      var dbMarkerId = dbMarker.getMarkerId();
+      markers[dbMarkerId] = Marker(
+        icon: customMarkers[dbMarker.markerType],
+        markerId: dbMarkerId,
+        position: dbMarker.coordinates,
+        infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
+        onTap: () {},
+      );
+    }
+
+    setState(() {
+
+      print('markers: ${markers}');
+      // adding a new marker to map
+      // markers[markerId] = marker;
+    });
   }
 
   // создание метки
@@ -264,7 +329,7 @@ class _MainMapState extends State<MainMap> {
     //   markerType = 'danger';
     // }
 
-    if (markerType == MarkerType.noType){
+    if (markerType == MarkerType.noType) {
       return;
     }
     var latLon = await location.getLocation();
@@ -277,28 +342,12 @@ class _MainMapState extends State<MainMap> {
       markerId: markerId,
       position: markerCoordinates,
       infoWindow: InfoWindow(title: markerId.value, snippet: '*'),
-      onTap: () {
-      },
+      onTap: () {},
     );
 
-    DbMainMethods.uploadPoint(markerCoordinates, markerType, ['-555605']);
-    var dbMarkers = await DbMainMethods.downloadPointsList(['-555605']);
-
-    setState(() {
-      markers = {};
-      for (var dbMarker in dbMarkers){
-        var dbMarkerId = dbMarker.getMarkerId();
-        markers[dbMarkerId] = Marker(
-          icon: customMarkers[dbMarker.markerType],
-          markerId: dbMarkerId,
-          position: dbMarker.coordinates,
-          infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
-          onTap: () {
-          },
-        );
-      }
-      // adding a new marker to map
-      // markers[markerId] = marker;
+    setState(() async {
+      await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());
+      await updateMarkers();
     });
   }
 

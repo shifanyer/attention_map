@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData)
               return FutureBuilder(
-                  future: DbMainMethods.downloadPointsList(['-555605']),
+                  future: DbMainMethods.downloadPointsList(['0']),
                   builder: (context, pointsListSnapshot) {
                     if (snapshot.hasData) {
                       return MainMap(
