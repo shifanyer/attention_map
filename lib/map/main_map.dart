@@ -30,6 +30,7 @@ class _MainMapState extends State<MainMap> {
   var centersSet = <String>{};
   bool firstLoad = true;
   List<MarkerInfo> dbMarkers = [];
+  double zoomValue = 17.0;
 
   // Marker marker;
   Location location = Location();
@@ -76,12 +77,12 @@ class _MainMapState extends State<MainMap> {
   }
 
   void _onMapCreated(GoogleMapController _cntlr) {
-    // _controller = _controller;
+    _controller = _cntlr;
     location.onLocationChanged.listen((l) {
       if (_controller != null) {
         _controller.animateCamera(
           CameraUpdate.newCameraPosition(
-            CameraPosition(target: LatLng(l.latitude, l.longitude), zoom: 15),
+            CameraPosition(target: LatLng(l.latitude, l.longitude), zoom: zoomValue),
           ),
         );
         /*
@@ -120,7 +121,7 @@ class _MainMapState extends State<MainMap> {
                                 height: MediaQuery.of(context).size.height * 0.8,
                                 width: MediaQuery.of(context).size.width,
                                 child: GoogleMap(
-                                  initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: 15),
+                                  initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
                                   mapType: MapType.normal,
                                   onMapCreated: _onMapCreated,
                                   myLocationEnabled: true,
@@ -204,10 +205,17 @@ class _MainMapState extends State<MainMap> {
       print(centersSet);
       print(updatedCentersSet);
       if (!centersSet.containsAll(updatedCentersSet)) {
-        print('HERE');
         centersSet = updatedCentersSet;
         await updateMarkers();
       }
+      _controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue),
+        ),
+      );
+      _currentPosition = currentLocation;
+      initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+      /*
       setState(() {
         _currentPosition = currentLocation;
         initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
@@ -225,6 +233,7 @@ class _MainMapState extends State<MainMap> {
         });
         */
       });
+      */
     });
   }
 
@@ -283,8 +292,6 @@ class _MainMapState extends State<MainMap> {
     }
 
     setState(() {
-
-      print('markers: ${markers}');
       // adding a new marker to map
       // markers[markerId] = marker;
     });
