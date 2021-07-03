@@ -22,13 +22,14 @@ class MainMap extends StatefulWidget {
 }
 
 class _MainMapState extends State<MainMap> {
-  Map<MarkerId, Marker> markers = {};
+  List<Marker> markers = [];
   LocationData _currentPosition;
   Map<MarkerType, BitmapDescriptor> customMarkers = {};
   String _address, _dateTime;
   GoogleMapController mapController;
   var centersSet = <String>{};
   bool firstLoad = true;
+  List<MarkerInfo> dbMarkers = [];
 
   // Marker marker;
   Location location = Location();
@@ -58,15 +59,16 @@ class _MainMapState extends State<MainMap> {
       await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/destination_map_marker.png');
 
       //ДОБАВЛЕНИЕ ТОЧЕК В map точек
+      dbMarkers = markersList;
       for (var dbMarker in markersList) {
         var dbMarkerId = dbMarker.getMarkerId();
-        markers[dbMarkerId] = Marker(
+        markers.add(Marker(
           icon: customMarkers[dbMarker.markerType],
           markerId: dbMarkerId,
           position: dbMarker.coordinates,
           infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
           onTap: () {},
-        );
+        ));
       }
       firstLoad = false;
     }
@@ -122,7 +124,7 @@ class _MainMapState extends State<MainMap> {
                                   mapType: MapType.normal,
                                   onMapCreated: _onMapCreated,
                                   myLocationEnabled: true,
-                                  markers: markers.values.toSet(),
+                                  markers: markers.toSet(),
                                 ),
                               ),
 
@@ -168,7 +170,7 @@ class _MainMapState extends State<MainMap> {
                 : Center(child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator())),
             floatingActionButton: FloatingActionButton(
               onPressed: () async {
-                await addMarker();
+                await addMarker(initialCameraPosition);
               },
             ),
           );
@@ -248,7 +250,7 @@ class _MainMapState extends State<MainMap> {
     var resSet = <String>{};
 
     for (var center in centersList) {
-      if (((center.latitude - currentLocation.latitude) <= 0.51) && ((center.longitude - currentLocation.longitude) <= 0.51)) {
+      if (((center.latitude - currentLocation.latitude).abs() <= 0.51) && ((center.longitude - currentLocation.longitude).abs() <= 0.51)) {
         resSet.add(((center.latitude * 10).toString()).split('.').first + ((center.longitude * 10).toString()).split('.').first);
       }
     }
@@ -266,18 +268,18 @@ class _MainMapState extends State<MainMap> {
 
   // загрузка маркеров из db
   Future<void> updateMarkers() async {
-    var dbMarkers = await DbMainMethods.downloadPointsList(centersSet.toList());
+    dbMarkers = await DbMainMethods.downloadPointsList(centersSet.toList());
 
-    markers = {};
+    markers = [];
     for (var dbMarker in dbMarkers) {
       var dbMarkerId = dbMarker.getMarkerId();
-      markers[dbMarkerId] = Marker(
+      markers.add(Marker(
         icon: customMarkers[dbMarker.markerType],
         markerId: dbMarkerId,
         position: dbMarker.coordinates,
         infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
         onTap: () {},
-      );
+      ));
     }
 
     setState(() {
@@ -289,7 +291,7 @@ class _MainMapState extends State<MainMap> {
   }
 
   // создание метки
-  Future<void> addMarker() async {
+  Future<void> addMarker(LatLng location) async {
     var pointType = '';
     // выбор типа точки
     await showModalBottomSheet(
@@ -332,18 +334,18 @@ class _MainMapState extends State<MainMap> {
     if (markerType == MarkerType.noType) {
       return;
     }
-    var latLon = await location.getLocation();
+    // var latLon = await location.getLocation();
+    var latLon = location;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
-    var markerIdVal = markerIdGen(markerCoordinates);
-    final MarkerId markerId = MarkerId(markerIdVal);
-    // creating a new MARKER
-    final Marker marker = Marker(
-      icon: customMarkers[markerType],
-      markerId: markerId,
-      position: markerCoordinates,
-      infoWindow: InfoWindow(title: markerId.value, snippet: '*'),
-      onTap: () {},
-    );
+
+    /*
+    for (var marker in dbMarkers) {
+      if (((marker.coordinates.latitude - markerCoordinates.latitude).abs() <= 0.00001) && ((marker.coordinates.longitude - markerCoordinates.longitude).abs() <= 0.00001)){
+
+        break;
+      }
+    }
+     */
 
     setState(() async {
       await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());

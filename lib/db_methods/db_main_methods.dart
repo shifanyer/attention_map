@@ -12,13 +12,21 @@ import 'fire_storages/fire_storage_service.dart';
 class DbMainMethods {
   static Future<void> uploadPoint(LatLng pointCoordinates, MarkerType markerType, List<String> centers) async {
     var pointType = EnumMethods.enumToString(markerType);
+    var markerId = (pointCoordinates.latitude * 1000).truncate().toString() + (pointCoordinates.longitude * 1000).truncate().toString();
     for (var center in centers) {
-      var newFile = FirebaseDatabase.instance.reference().child(center).child(pointType).push();
-      newFile.child('coordX').set(pointCoordinates.latitude);
-      newFile.child('coordY').set(pointCoordinates.longitude);
-      newFile.child('confirms').set(1);
-      newFile.child('creation_time').set(DateTime.now().millisecondsSinceEpoch);
-      newFile.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
+      var newItem = FirebaseDatabase.instance.reference().child(center).child(pointType).child(markerId);
+      var itemObj = await newItem.once();
+      if (itemObj?.value == null) {
+        newItem.child('coordX').set(pointCoordinates.latitude);
+        newItem.child('coordY').set(pointCoordinates.longitude);
+        newItem.child('confirms').set(1);
+        newItem.child('creation_time').set(DateTime.now().millisecondsSinceEpoch);
+        newItem.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
+      }
+      else{
+        newItem.child('confirms').set(itemObj.value['confirms'] + 1);
+        newItem.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
+      }
     }
   }
 
@@ -33,7 +41,7 @@ class DbMainMethods {
       for (var markerType in MarkerType.values) {
         var typedMap = radiusSnapshot?.value[EnumMethods.enumToString(markerType)] ?? {};
         for (var point in typedMap?.values ?? []) {
-          var pointCoordinates = LatLng(point['coordX'], point['coordY']);
+          var pointCoordinates = LatLng(point['coordX'] * 1.0, point['coordY'] * 1.0);
           var confirmsNumber = point['confirms'];
           var lastTimeConfirmation = point['last_confirm_time'];
           var newPoint = MarkerInfo(
@@ -47,4 +55,9 @@ class DbMainMethods {
     }
     return markers;
   }
+
+  static newConfirm() {
+
+  }
+
 }
