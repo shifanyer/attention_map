@@ -1,1 +1,1 @@
-enum MarkerType { camera, dps, monument, danger, other, noType}
+enum MarkerType {noType, camera, dps, monument, danger, other, dtp, help}

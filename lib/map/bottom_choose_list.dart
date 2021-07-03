@@ -1,16 +1,29 @@
+import 'package:attention_map/enums/marker_type.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SelectPointType extends StatelessWidget {
 
-  final ValueChanged<String> pointType;
+  final ValueChanged<MarkerType> pointType;
 
   static const typesList = [
     'Камера',
     'Достопримечательность',
     'Пост ДПС',
     'Опасный участок дороги',
+    'ДТП',
+    'Нужна помощь',
     'Другое'
+  ];
+
+  static List<MarkerType> markerTypesList = [
+    MarkerType.camera,
+    MarkerType.monument,
+    MarkerType.dps,
+    MarkerType.danger,
+    MarkerType.dtp,
+    MarkerType.help,
+    MarkerType.other
   ];
 
   const SelectPointType({Key key, @required this.pointType}) : super(key: key);
@@ -30,13 +43,16 @@ class SelectPointType extends StatelessWidget {
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
               onTap: () {
-                pointType(typesList[index]);
+                pointType(markerTypesList[index]);
                 Navigator.pop(context);
               },
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Text(typesList[index]),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(typesList[index], style: TextStyle(fontSize: 18),),
+                  ),
                 ),
               ),
             );

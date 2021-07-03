@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:attention_map/db_methods/db_main_methods.dart';
+import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:flutter/material.dart';
@@ -55,9 +56,12 @@ class _MainMapState extends State<MainMap> {
       customMarkers[MarkerType.camera] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/camera_marker.png');
       customMarkers[MarkerType.dps] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/DPS_marker.png');
       customMarkers[MarkerType.monument] =
-      await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/monument_marker.png');
+          await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/monument_marker.png');
+      customMarkers[MarkerType.dtp] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/dtp_marker.png');
+      customMarkers[MarkerType.danger] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/danger_marker.png');
+      customMarkers[MarkerType.help] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/help_marker.png');
       customMarkers[MarkerType.other] =
-      await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/destination_map_marker.png');
+          await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/destination_map_marker.png');
 
       //ДОБАВЛЕНИЕ ТОЧЕК В map точек
       dbMarkers = markersList;
@@ -67,7 +71,7 @@ class _MainMapState extends State<MainMap> {
           icon: customMarkers[dbMarker.markerType],
           markerId: dbMarkerId,
           position: dbMarker.coordinates,
-          infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
+          infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirms}'),
           onTap: () {},
         ));
       }
@@ -173,6 +177,7 @@ class _MainMapState extends State<MainMap> {
               onPressed: () async {
                 await addMarker(initialCameraPosition);
               },
+              child: Icon(Icons.not_listed_location, size: 30,),
             ),
           );
         });
@@ -202,8 +207,6 @@ class _MainMapState extends State<MainMap> {
     initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
     location.onLocationChanged.listen((LocationData currentLocation) async {
       Set<String> updatedCentersSet = getCentersSet(currentLocation);
-      print(centersSet);
-      print(updatedCentersSet);
       if (!centersSet.containsAll(updatedCentersSet)) {
         centersSet = updatedCentersSet;
         await updateMarkers();
@@ -286,7 +289,7 @@ class _MainMapState extends State<MainMap> {
         icon: customMarkers[dbMarker.markerType],
         markerId: dbMarkerId,
         position: dbMarker.coordinates,
-        infoWindow: InfoWindow(title: dbMarkerId.value, snippet: '*'),
+        infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirms}'),
         onTap: () {},
       ));
     }
@@ -299,7 +302,7 @@ class _MainMapState extends State<MainMap> {
 
   // создание метки
   Future<void> addMarker(LatLng location) async {
-    var pointType = '';
+    var pointType = MarkerType.noType;
     // выбор типа точки
     await showModalBottomSheet(
       context: context,
@@ -307,7 +310,7 @@ class _MainMapState extends State<MainMap> {
         return Builder(
           builder: (BuildContext context) {
             return SelectPointType(
-              pointType: (String value) {
+              pointType: (MarkerType value) {
                 pointType = value;
               },
             );
@@ -321,23 +324,7 @@ class _MainMapState extends State<MainMap> {
       isDismissible: true,
     );
 
-    var markerType = MarkerType.noType;
-    if (pointType == 'Камера') {
-      markerType = MarkerType.camera;
-    }
-    if (pointType == 'Пост ДПС') {
-      markerType = MarkerType.dps;
-    }
-    if (pointType == 'Достопримечательность') {
-      markerType = MarkerType.monument;
-    }
-    if (pointType == 'Другое') {
-      markerType = MarkerType.other;
-    }
-    // if (pointType == 'Опасный участок дороги') {
-    //   markerType = 'danger';
-    // }
-
+    var markerType = pointType;
     if (markerType == MarkerType.noType) {
       return;
     }
@@ -354,10 +341,9 @@ class _MainMapState extends State<MainMap> {
     }
      */
 
-    setState(() async {
-      await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());
-      await updateMarkers();
-    });
+    await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());
+    await updateMarkers();
+    setState(() {});
   }
 
   //создание ID метки
