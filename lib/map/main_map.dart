@@ -4,6 +4,8 @@ import 'package:attention_map/db_methods/db_main_methods.dart';
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:geocoder/geocoder.dart';
@@ -32,12 +34,13 @@ class _MainMapState extends State<MainMap> {
   bool firstLoad = true;
   List<MarkerInfo> dbMarkers = [];
   double zoomValue = 17.0;
+  bool followLocation = true;
 
   // Marker marker;
   Location location = Location();
 
   GoogleMapController _controller;
-  LatLng initialCameraPosition = LatLng(0.5937, 0.9629);
+  LatLng initialCameraPosition = LatLng(59.666999, 51.58008);
 
   @override
   void initState() {
@@ -82,6 +85,7 @@ class _MainMapState extends State<MainMap> {
 
   void _onMapCreated(GoogleMapController _cntlr) {
     _controller = _cntlr;
+    /*
     location.onLocationChanged.listen((l) {
       if (_controller != null) {
         _controller.animateCamera(
@@ -99,6 +103,7 @@ class _MainMapState extends State<MainMap> {
          */
       }
     });
+    */
   }
 
   @override
@@ -107,79 +112,124 @@ class _MainMapState extends State<MainMap> {
         future: customMarkersMaker(widget.markersList),
         builder: (context, customMarkersMakerSnapshot) {
           return Scaffold(
-            body: (customMarkersMakerSnapshot?.data == true)
-                ? Container(
-                    decoration: BoxDecoration(
-                      color: Colors.cyanAccent,
-                    ),
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    child: SafeArea(
-                      child: Container(
-                        color: Colors.blueGrey.withOpacity(.8),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              //карта
-                              Container(
-                                height: MediaQuery.of(context).size.height * 0.8,
-                                width: MediaQuery.of(context).size.width,
-                                child: GoogleMap(
-                                  initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
-                                  mapType: MapType.normal,
-                                  onMapCreated: _onMapCreated,
-                                  myLocationEnabled: true,
-                                  markers: markers.toSet(),
+              body: (customMarkersMakerSnapshot?.data == true)
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: Colors.cyanAccent,
+                      ),
+                      height: MediaQuery.of(context).size.height,
+                      width: MediaQuery.of(context).size.width,
+                      child: SafeArea(
+                        child: Container(
+                          color: Colors.blueGrey.withOpacity(.8),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                //карта
+                                Container(
+                                  height: MediaQuery.of(context).size.height * 0.8,
+                                  width: MediaQuery.of(context).size.width,
+                                  child: GoogleMap(
+                                    initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
+                                    mapType: MapType.normal,
+                                    onMapCreated: _onMapCreated,
+                                    myLocationEnabled: true,
+                                    markers: markers.toSet(),
+                                    mapToolbarEnabled: false,
+                                    myLocationButtonEnabled: false,
+                                    zoomControlsEnabled: false,
+                                    trafficEnabled: true,
+                                  ),
                                 ),
-                              ),
 
-                              SizedBox(
-                                height: 3,
-                              ),
-                              if (_dateTime != null)
-                                Text(
-                                  "Date/Time: $_dateTime",
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.white,
+                                SizedBox(
+                                  height: 3,
+                                ),
+                                if (_dateTime != null)
+                                  Text(
+                                    "Date/Time: $_dateTime",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.white,
+                                    ),
                                   ),
+                                SizedBox(
+                                  height: 3,
                                 ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              if (_currentPosition != null)
-                                Text(
-                                  "Latitude: ${_currentPosition.latitude}, Longitude: ${_currentPosition.longitude}",
-                                  style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                              if (_address != null)
-                                Text(
-                                  "Address: $_address",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
+                                if (_currentPosition != null)
+                                  Text(
+                                    "Latitude: ${_currentPosition.latitude}, Longitude: ${_currentPosition.longitude}",
+                                    style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
                                   ),
+                                SizedBox(
+                                  height: 3,
                                 ),
-                              SizedBox(
-                                height: 3,
-                              ),
-                            ],
+                                if (_address != null)
+                                  Text(
+                                    "Address: $_address",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                SizedBox(
+                                  height: 3,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
+                    )
+                  : Center(child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator())),
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+              floatingActionButton: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    FloatingActionButton(
+                      onPressed: () {
+                        followLocation = !followLocation;
+                        if (followLocation) {
+                          _controller.animateCamera(
+                            CameraUpdate.newCameraPosition(
+                              CameraPosition(
+                                  target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                                  zoom: zoomValue,
+                                  tilt: 15.0,
+                                  bearing: 25),
+                            ),
+                          );
+                        }
+                        setState(() {});
+                      },
+                      child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
                     ),
-                  )
-                : Center(child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator())),
-            floatingActionButton: FloatingActionButton(
+                    FloatingActionButton(
+                      onPressed: () async {
+                        await addMarker(initialCameraPosition);
+                      },
+                      child: Icon(
+                        Icons.not_listed_location,
+                        size: 30,
+                      ),
+                    )
+                  ],
+                ),
+              )
+              /*
+            FloatingActionButton(
               onPressed: () async {
                 await addMarker(initialCameraPosition);
               },
-              child: Icon(Icons.not_listed_location, size: 30,),
+              child: Icon(
+                Icons.not_listed_location,
+                size: 30,
+              ),
             ),
-          );
+            */
+              );
         });
   }
 
@@ -211,11 +261,25 @@ class _MainMapState extends State<MainMap> {
         centersSet = updatedCentersSet;
         await updateMarkers();
       }
-      _controller.animateCamera(
-        CameraUpdate.newCameraPosition(
-          CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue),
-        ),
-      );
+
+      // Zoom при перемещении обратно к геопозиции не меняется, если отдалиться или приблизиться
+      zoomValue = await _controller.getZoomLevel();
+      var showRegionBorders = await _controller.getVisibleRegion();
+      var centerOfRegion = LatLng((showRegionBorders.northeast.latitude + showRegionBorders.southwest.latitude) / 2,
+          (showRegionBorders.northeast.longitude + showRegionBorders.southwest.longitude) / 2);
+      if (((centerOfRegion.latitude - currentLocation.latitude).abs() > 0.0005) &&
+          ((centerOfRegion.longitude - currentLocation.longitude).abs() > 0.0005)) {
+        followLocation = false;
+        setState(() {});
+      }
+      if (followLocation) {
+        _controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
+          ),
+        );
+      }
+
       _currentPosition = currentLocation;
       initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
       /*
