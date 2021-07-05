@@ -35,6 +35,8 @@ class _MainMapState extends State<MainMap> {
   List<MarkerInfo> dbMarkers = [];
   double zoomValue = 17.0;
   bool followLocation = true;
+  MarkerInfo changeMarkerInfo;
+  bool ifChangeMarkerInfo = false;
 
   // Marker marker;
   Location location = Location();
@@ -85,6 +87,17 @@ class _MainMapState extends State<MainMap> {
 
   void _onMapCreated(GoogleMapController _cntlr) {
     _controller = _cntlr;
+    if (followLocation) {
+      _controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+              target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+              zoom: zoomValue,
+              tilt: 15.0,
+              bearing: 25),
+        ),
+      );
+    }
     /*
     location.onLocationChanged.listen((l) {
       if (_controller != null) {
@@ -139,6 +152,11 @@ class _MainMapState extends State<MainMap> {
                                     myLocationButtonEnabled: false,
                                     zoomControlsEnabled: false,
                                     trafficEnabled: true,
+                                    onTap: (_) {
+                                      setState(() {
+                                        ifChangeMarkerInfo = false;
+                                      });
+                                    },
                                   ),
                                 ),
 
@@ -188,7 +206,7 @@ class _MainMapState extends State<MainMap> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    FloatingActionButton(
+                    (ifChangeMarkerInfo) ? confirmMarkerFAB(changeMarkerInfo) : FloatingActionButton(
                       onPressed: () {
                         followLocation = !followLocation;
                         if (followLocation) {
@@ -206,7 +224,7 @@ class _MainMapState extends State<MainMap> {
                       },
                       child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
                     ),
-                    FloatingActionButton(
+                    (ifChangeMarkerInfo) ? subtractMarkerFAB(changeMarkerInfo) : FloatingActionButton(
                       onPressed: () async {
                         await addMarker(initialCameraPosition);
                       },
@@ -369,6 +387,7 @@ class _MainMapState extends State<MainMap> {
               ),
             );
           }
+          /*
           await showModalBottomSheet(
             context: context,
             builder: (context) {
@@ -379,25 +398,8 @@ class _MainMapState extends State<MainMap> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        FloatingActionButton(
-                          onPressed: () {
-                            confirmMarker(dbMarker);
-                            Navigator.pop(context);
-                          },
-                          child: Icon(Icons.arrow_upward_outlined),
-                          backgroundColor: Colors.lightGreen,
-                        ),
-                        FloatingActionButton(
-                          onPressed: () {
-                            // dbMarker.confirms = dbMarker.confirms - 1;
-                            // setState(() {});
-                            subtractMarker(dbMarker);
-                            Navigator.pop(context);
-                            // addMarker(dbMarker.coordinates);
-                          },
-                          child: Icon(Icons.arrow_downward_outlined),
-                          backgroundColor: Colors.redAccent,
-                        ),
+                        confirmMarkerFAB(dbMarker),
+                        subtractMarkerFAB(dbMarker)
                       ],
                     ),
                   );
@@ -410,6 +412,13 @@ class _MainMapState extends State<MainMap> {
             isScrollControlled: false,
             isDismissible: true,
           );
+
+
+           */
+          setState(() {
+            changeMarkerInfo = dbMarker;
+            ifChangeMarkerInfo = true;
+          });
         },
         // consumeTapEvents: true,
       ));
@@ -513,4 +522,30 @@ class _MainMapState extends State<MainMap> {
   String markerIdGen(LatLng coordinates) {
     return coordinates.latitude.toString() + coordinates.longitude.toString();
   }
+
+  FloatingActionButton confirmMarkerFAB(MarkerInfo dbMarker) {
+    return FloatingActionButton(
+      onPressed: () {
+        confirmMarker(dbMarker);
+        Navigator.pop(context);
+      },
+      child: Icon(Icons.arrow_upward_outlined),
+      backgroundColor: Colors.lightGreen,
+    );
+  }
+
+  FloatingActionButton subtractMarkerFAB(MarkerInfo dbMarker) {
+    return FloatingActionButton(
+      onPressed: () {
+        // dbMarker.confirms = dbMarker.confirms - 1;
+        // setState(() {});
+        subtractMarker(dbMarker);
+        Navigator.pop(context);
+        // addMarker(dbMarker.coordinates);
+      },
+      child: Icon(Icons.arrow_downward_outlined),
+      backgroundColor: Colors.redAccent,
+    );
+  }
+
 }
