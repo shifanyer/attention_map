@@ -263,7 +263,9 @@ class _MainMapState extends State<MainMap> {
       }
 
       // Zoom при перемещении обратно к геопозиции не меняется, если отдалиться или приблизиться
-      zoomValue = await _controller.getZoomLevel();
+      if (_controller!= null) {
+        zoomValue = await _controller.getZoomLevel();
+      }
       var showRegionBorders = await _controller.getVisibleRegion();
       var centerOfRegion = LatLng((showRegionBorders.northeast.latitude + showRegionBorders.southwest.latitude) / 2,
           (showRegionBorders.northeast.longitude + showRegionBorders.southwest.longitude) / 2);
