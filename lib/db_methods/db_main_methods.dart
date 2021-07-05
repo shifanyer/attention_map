@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'fire_storages/fire_storage_service.dart';
 
 class DbMainMethods {
+
   static Future<void> uploadPoint(LatLng pointCoordinates, MarkerType markerType, List<String> centers) async {
     var pointType = EnumMethods.enumToString(markerType);
     var markerId = (pointCoordinates.latitude * 1000).truncate().toString() + (pointCoordinates.longitude * 1000).truncate().toString();
@@ -26,6 +27,18 @@ class DbMainMethods {
       else{
         newItem.child('confirms').set(itemObj.value['confirms'] + 1);
         newItem.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
+      }
+    }
+  }
+
+  static Future<void> subtractPoint(LatLng pointCoordinates, MarkerType markerType, List<String> centers) async {
+    var pointType = EnumMethods.enumToString(markerType);
+    var markerId = (pointCoordinates.latitude * 1000).truncate().toString() + (pointCoordinates.longitude * 1000).truncate().toString();
+    for (var center in centers) {
+      var newItem = FirebaseDatabase.instance.reference().child(center).child(pointType).child(markerId);
+      var itemObj = await newItem.once();
+      if (itemObj?.value != null) {
+        newItem.child('confirms').set(itemObj.value['confirms'] - 1);
       }
     }
   }

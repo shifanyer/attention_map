@@ -353,8 +353,63 @@ class _MainMapState extends State<MainMap> {
         icon: customMarkers[dbMarker.markerType],
         markerId: dbMarkerId,
         position: dbMarker.coordinates,
+        visible: dbMarker.confirms > 0,
         infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirms}'),
-        onTap: () {},
+        onTap: () async {
+          if (followLocation) {
+            _controller.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
+                    target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                    zoom: zoomValue,
+                    tilt: 15.0,
+                    bearing: 25),
+              ),
+            );
+          }
+          await showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Builder(
+                builder: (BuildContext context) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        FloatingActionButton(
+                          onPressed: () {
+                            confirmMarker(dbMarker);
+                            Navigator.pop(context);
+                          },
+                          child: Icon(Icons.arrow_upward_outlined),
+                          backgroundColor: Colors.lightGreen,
+                        ),
+                        FloatingActionButton(
+                          onPressed: () {
+                            // dbMarker.confirms = dbMarker.confirms - 1;
+                            // setState(() {});
+                            subtractMarker(dbMarker);
+                            Navigator.pop(context);
+                            // addMarker(dbMarker.coordinates);
+                          },
+                          child: Icon(Icons.arrow_downward_outlined),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            isScrollControlled: false,
+            isDismissible: true,
+          );
+        },
+        // consumeTapEvents: true,
       ));
     }
 
@@ -406,6 +461,48 @@ class _MainMapState extends State<MainMap> {
      */
 
     await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());
+    await updateMarkers();
+    setState(() {});
+  }
+
+  // подтверждение метки
+  Future<void> confirmMarker(MarkerInfo markerInfo) async {
+
+    // var latLon = await location.getLocation();
+    var latLon = markerInfo.coordinates;
+    var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
+
+    /*
+    for (var marker in dbMarkers) {
+      if (((marker.coordinates.latitude - markerCoordinates.latitude).abs() <= 0.00001) && ((marker.coordinates.longitude - markerCoordinates.longitude).abs() <= 0.00001)){
+
+        break;
+      }
+    }
+     */
+
+    await DbMainMethods.uploadPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
+    await updateMarkers();
+    setState(() {});
+  }
+
+  // убавить подтверждения метки
+  Future<void> subtractMarker(MarkerInfo markerInfo) async {
+
+    // var latLon = await location.getLocation();
+    var latLon = markerInfo.coordinates;
+    var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
+
+    /*
+    for (var marker in dbMarkers) {
+      if (((marker.coordinates.latitude - markerCoordinates.latitude).abs() <= 0.00001) && ((marker.coordinates.longitude - markerCoordinates.longitude).abs() <= 0.00001)){
+
+        break;
+      }
+    }
+     */
+
+    await DbMainMethods.subtractPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
     setState(() {});
   }

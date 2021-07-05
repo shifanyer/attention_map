@@ -4,9 +4,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MarkerInfo {
   final MarkerType markerType;
-  final LatLng coordinates;
-  final int confirms;
-  final int lastTimeConfirmation;
+  LatLng coordinates;
+  int confirms;
+  int lastTimeConfirmation;
 
   MarkerInfo({@required this.markerType, @required this.coordinates, @required this.confirms, @required this.lastTimeConfirmation});
 
