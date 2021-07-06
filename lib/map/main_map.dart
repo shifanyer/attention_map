@@ -7,6 +7,7 @@ import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:location/location.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
@@ -364,6 +365,9 @@ class _MainMapState extends State<MainMap> {
                 ifChangeMarkerInfo = false;
                 _controller.hideMarkerInfoWindow(dbMarker.getMarkerId());
               }
+              else{
+                changeMarkerInfo = dbMarker;
+              }
             }
           });
         },
@@ -419,7 +423,17 @@ class _MainMapState extends State<MainMap> {
     var latLon = markerInfo.coordinates;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
 
-
+    Fluttertoast.showToast(
+        msg: "Число подтверждений увеличено",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+    _controller.hideMarkerInfoWindow(markerInfo.getMarkerId());
+    setState(() {ifChangeMarkerInfo = false;});
     await DbMainMethods.uploadPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
     // setState(() {});
@@ -432,6 +446,17 @@ class _MainMapState extends State<MainMap> {
     var latLon = markerInfo.coordinates;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
 
+    Fluttertoast.showToast(
+        msg: "Число подтверждений уменьшено",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+    setState(() {ifChangeMarkerInfo = false;});
+    _controller.hideMarkerInfoWindow(markerInfo.getMarkerId());
     await DbMainMethods.subtractPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
     // setState(() {});
