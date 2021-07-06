@@ -35,6 +35,7 @@ class _MainMapState extends State<MainMap> {
   List<MarkerInfo> dbMarkers = [];
   double zoomValue = 17.0;
   bool followLocation = true;
+  bool isAutoCameraMove = true;
   MarkerInfo changeMarkerInfo;
   bool ifChangeMarkerInfo = false;
 
@@ -88,6 +89,7 @@ class _MainMapState extends State<MainMap> {
   void _onMapCreated(GoogleMapController _cntlr) {
     _controller = _cntlr;
     if (followLocation) {
+      isAutoCameraMove = true;
       _controller.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(
@@ -98,25 +100,6 @@ class _MainMapState extends State<MainMap> {
         ),
       );
     }
-    /*
-    location.onLocationChanged.listen((l) {
-      if (_controller != null) {
-        _controller.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: LatLng(l.latitude, l.longitude), zoom: zoomValue),
-          ),
-        );
-        /*
-        Set<String> updatedCentersSet = getCentersSet(l);
-        if (!centersSet.containsAll(updatedCentersSet)) {
-          centersSet = updatedCentersSet;
-          updateMarkers();
-        }
-
-         */
-      }
-    });
-    */
   }
 
   @override
@@ -155,6 +138,20 @@ class _MainMapState extends State<MainMap> {
                                     onTap: (_) {
                                       setState(() {
                                         ifChangeMarkerInfo = false;
+                                      });
+                                    },
+                                    onCameraMoveStarted: () {
+                                      setState(() {
+                                        if (!isAutoCameraMove)
+                                          followLocation = false;
+                                      });
+                                    },
+                                    onCameraIdle: () {
+                                      setState(() {
+                                        if (isAutoCameraMove) {
+                                          followLocation = true;
+                                        }
+                                        isAutoCameraMove = false;
                                       });
                                     },
                                   ),
@@ -210,6 +207,7 @@ class _MainMapState extends State<MainMap> {
                       onPressed: () {
                         followLocation = !followLocation;
                         if (followLocation) {
+                          isAutoCameraMove = true;
                           _controller.animateCamera(
                             CameraUpdate.newCameraPosition(
                               CameraPosition(
@@ -273,6 +271,7 @@ class _MainMapState extends State<MainMap> {
 
     _currentPosition = await location.getLocation();
     initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+
     location.onLocationChanged.listen((LocationData currentLocation) async {
       Set<String> updatedCentersSet = getCentersSet(currentLocation);
       if (!centersSet.containsAll(updatedCentersSet)) {
@@ -287,12 +286,9 @@ class _MainMapState extends State<MainMap> {
       var showRegionBorders = await _controller.getVisibleRegion();
       var centerOfRegion = LatLng((showRegionBorders.northeast.latitude + showRegionBorders.southwest.latitude) / 2,
           (showRegionBorders.northeast.longitude + showRegionBorders.southwest.longitude) / 2);
-      if (((centerOfRegion.latitude - currentLocation.latitude).abs() > 0.0005) &&
-          ((centerOfRegion.longitude - currentLocation.longitude).abs() > 0.0005)) {
-        followLocation = false;
-        setState(() {});
-      }
+
       if (followLocation) {
+        isAutoCameraMove = true;
         _controller.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
@@ -377,6 +373,7 @@ class _MainMapState extends State<MainMap> {
         infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirms}'),
         onTap: () async {
           if (followLocation) {
+            isAutoCameraMove = true;
             _controller.animateCamera(
               CameraUpdate.newCameraPosition(
                 CameraPosition(
@@ -387,34 +384,6 @@ class _MainMapState extends State<MainMap> {
               ),
             );
           }
-          /*
-          await showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        confirmMarkerFAB(dbMarker),
-                        subtractMarkerFAB(dbMarker)
-                      ],
-                    ),
-                  );
-                },
-              );
-            },
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            isScrollControlled: false,
-            isDismissible: true,
-          );
-
-
-           */
           setState(() {
             if (!ifChangeMarkerInfo) {
               changeMarkerInfo = dbMarker;
@@ -423,6 +392,7 @@ class _MainMapState extends State<MainMap> {
             else{
               if (ifChangeMarkerInfo && (changeMarkerInfo == dbMarker)) {
                 ifChangeMarkerInfo = false;
+                _controller.hideMarkerInfoWindow(dbMarker.getMarkerId());
               }
             }
           });
@@ -431,10 +401,7 @@ class _MainMapState extends State<MainMap> {
       ));
     }
 
-    setState(() {
-      // adding a new marker to map
-      // markers[markerId] = marker;
-    });
+    setState(() {});
 
   }
 
