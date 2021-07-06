@@ -416,8 +416,15 @@ class _MainMapState extends State<MainMap> {
 
            */
           setState(() {
-            changeMarkerInfo = dbMarker;
-            ifChangeMarkerInfo = true;
+            if (!ifChangeMarkerInfo) {
+              changeMarkerInfo = dbMarker;
+              ifChangeMarkerInfo = true;
+            }
+            else{
+              if (ifChangeMarkerInfo && (changeMarkerInfo == dbMarker)) {
+                ifChangeMarkerInfo = false;
+              }
+            }
           });
         },
         // consumeTapEvents: true,
@@ -428,6 +435,7 @@ class _MainMapState extends State<MainMap> {
       // adding a new marker to map
       // markers[markerId] = marker;
     });
+
   }
 
   // создание метки
@@ -494,7 +502,7 @@ class _MainMapState extends State<MainMap> {
 
     await DbMainMethods.uploadPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
-    setState(() {});
+    // setState(() {});
   }
 
   // убавить подтверждения метки
@@ -515,7 +523,7 @@ class _MainMapState extends State<MainMap> {
 
     await DbMainMethods.subtractPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
-    setState(() {});
+    // setState(() {});
   }
 
   //создание ID метки
@@ -527,7 +535,7 @@ class _MainMapState extends State<MainMap> {
     return FloatingActionButton(
       onPressed: () {
         confirmMarker(dbMarker);
-        Navigator.pop(context);
+        // Navigator.pop(context);
       },
       child: Icon(Icons.arrow_upward_outlined),
       backgroundColor: Colors.lightGreen,
@@ -540,7 +548,7 @@ class _MainMapState extends State<MainMap> {
         // dbMarker.confirms = dbMarker.confirms - 1;
         // setState(() {});
         subtractMarker(dbMarker);
-        Navigator.pop(context);
+        // Navigator.pop(context);
         // addMarker(dbMarker.coordinates);
       },
       child: Icon(Icons.arrow_downward_outlined),
