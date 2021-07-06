@@ -234,17 +234,6 @@ class _MainMapState extends State<MainMap> {
                   ],
                 ),
               )
-              /*
-            FloatingActionButton(
-              onPressed: () async {
-                await addMarker(initialCameraPosition);
-              },
-              child: Icon(
-                Icons.not_listed_location,
-                size: 30,
-              ),
-            ),
-            */
               );
         });
   }
@@ -298,25 +287,6 @@ class _MainMapState extends State<MainMap> {
 
       _currentPosition = currentLocation;
       initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
-      /*
-      setState(() {
-        _currentPosition = currentLocation;
-        initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
-
-        DateTime now = DateTime.now();
-        _dateTime = DateFormat('EEE d MMM kk:mm:ss ').format(now);
-
-
-        /*
-        _getAddress(_currentPosition.latitude, _currentPosition.longitude).then((value) {
-          setState(() {
-            // _address = "${value.first.addressLine}";
-            _address = "value.first.addressLine";
-          });
-        });
-        */
-      });
-      */
     });
   }
 
@@ -437,15 +407,6 @@ class _MainMapState extends State<MainMap> {
     var latLon = location;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
 
-    /*
-    for (var marker in dbMarkers) {
-      if (((marker.coordinates.latitude - markerCoordinates.latitude).abs() <= 0.00001) && ((marker.coordinates.longitude - markerCoordinates.longitude).abs() <= 0.00001)){
-
-        break;
-      }
-    }
-     */
-
     await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());
     await updateMarkers();
     setState(() {});
@@ -458,14 +419,6 @@ class _MainMapState extends State<MainMap> {
     var latLon = markerInfo.coordinates;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
 
-    /*
-    for (var marker in dbMarkers) {
-      if (((marker.coordinates.latitude - markerCoordinates.latitude).abs() <= 0.00001) && ((marker.coordinates.longitude - markerCoordinates.longitude).abs() <= 0.00001)){
-
-        break;
-      }
-    }
-     */
 
     await DbMainMethods.uploadPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
@@ -478,15 +431,6 @@ class _MainMapState extends State<MainMap> {
     // var latLon = await location.getLocation();
     var latLon = markerInfo.coordinates;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
-
-    /*
-    for (var marker in dbMarkers) {
-      if (((marker.coordinates.latitude - markerCoordinates.latitude).abs() <= 0.00001) && ((marker.coordinates.longitude - markerCoordinates.longitude).abs() <= 0.00001)){
-
-        break;
-      }
-    }
-     */
 
     await DbMainMethods.subtractPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
