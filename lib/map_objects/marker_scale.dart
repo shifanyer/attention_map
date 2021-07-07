@@ -38,6 +38,7 @@ class _MarkerScaleState extends State<MarkerScale> {
     var forPercent = confirmsFor / (confirmsFor + confirmsAgainst);
     return Container(
       height: boxSize * 2.5,
+      width: boxSize * 2 + spaceBetween + lineLength + spaceBetween + boxSize * 2,
       child: Row(
         children: [
           Column(
@@ -71,8 +72,6 @@ class _MarkerScaleState extends State<MarkerScale> {
             ],
           ),
           SizedBox(width: spaceBetween),
-          // Container(width: MediaQuery.of(context).size.width - 60.0 * 2 - 20.0 * 2 - 10.0, height: 7, color: Colors.cyan,),
-
           Column(
             children: [
               SizedBox(
@@ -122,9 +121,7 @@ class _MarkerScaleState extends State<MarkerScale> {
               ),
             ],
           ),
-
           SizedBox(width: spaceBetween),
-
           Column(
             children: [
               Container(
@@ -155,25 +152,6 @@ class _MarkerScaleState extends State<MarkerScale> {
               ),
             ],
           ),
-          /*
-          Container(
-            width: boxSize * 2,
-            child: FloatingActionButton(
-              onPressed: () {
-                print('pressed against');
-              },
-              backgroundColor: Color(0xffff0000),
-              child: Container(
-                  width: boxSize,
-                  height: boxSize,
-                  child: Image.asset(
-                    'assets/dislikeUPD.png',
-                    fit: BoxFit.fill,
-                  )),
-            ),
-          )
-          ,
-           */
         ],
       ),
     );

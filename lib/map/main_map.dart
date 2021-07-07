@@ -16,21 +16,24 @@ import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'bottom_choose_list.dart';
+import 'map_helper.dart';
 
 class MainMap extends StatefulWidget {
-  final LatLng startCameraPosition;
+  LatLng startCameraPosition;
   final List<MarkerInfo> markersList;
+  final Map<MarkerType, BitmapDescriptor> customMarkers;
+  GoogleMapController googleMapController;
 
-  const MainMap({Key key, this.startCameraPosition, @required this.markersList}) : super(key: key);
+  MainMap({Key key, this.startCameraPosition, @required this.markersList, @required this.customMarkers, @required this.googleMapController})
+      : super(key: key);
 
   @override
   _MainMapState createState() => _MainMapState();
 }
 
-class _MainMapState extends State<MainMap> {
+class _MainMapState extends State<MainMap> with MapHelper {
   List<Marker> markers = [];
   LocationData _currentPosition;
-  Map<MarkerType, BitmapDescriptor> customMarkers = {};
   String _address, _dateTime;
   GoogleMapController mapController;
   var centersSet = <String>{};
@@ -47,11 +50,13 @@ class _MainMapState extends State<MainMap> {
   // Marker marker;
   Location location = Location();
 
-  GoogleMapController _controller;
-  LatLng initialCameraPosition = LatLng(59.666999, 51.58008);
+  // LatLng initialCameraPosition = LatLng(59.666999, 51.58008);
+  LatLng initialCameraPosition;
 
   @override
   void initState() {
+    customMarkers = widget.customMarkers;
+    initialCameraPosition = widget.startCameraPosition;
     if (widget?.startCameraPosition != null) {
       initialCameraPosition = widget.startCameraPosition;
     }
@@ -63,17 +68,6 @@ class _MainMapState extends State<MainMap> {
   // создание меток
   Future<bool> customMarkersMaker(List<MarkerInfo> markersList) async {
     if (firstLoad) {
-      // заготовка стандартных маркеров
-      customMarkers[MarkerType.camera] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/camera_marker.png');
-      customMarkers[MarkerType.dps] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/DPS_marker.png');
-      customMarkers[MarkerType.monument] =
-          await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/monument_marker.png');
-      customMarkers[MarkerType.dtp] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/dtp_marker.png');
-      customMarkers[MarkerType.danger] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/danger_marker.png');
-      customMarkers[MarkerType.help] = await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/help_marker.png');
-      customMarkers[MarkerType.other] =
-          await BitmapDescriptor.fromAssetImage(ImageConfiguration(devicePixelRatio: 2.5), 'assets/destination_map_marker.png');
-
       //ДОБАВЛЕНИЕ ТОЧЕК В map точек
       dbMarkers = markersList;
       for (var dbMarker in markersList) {
@@ -92,16 +86,12 @@ class _MainMapState extends State<MainMap> {
   }
 
   void _onMapCreated(GoogleMapController _cntlr) {
-    _controller = _cntlr;
+    widget.googleMapController = _cntlr;
     if (followLocation) {
       isAutoCameraMove = true;
-      _controller.animateCamera(
+      widget.googleMapController.animateCamera(
         CameraUpdate.newCameraPosition(
-          CameraPosition(
-              target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
-              zoom: zoomValue,
-              tilt: 15.0,
-              bearing: 25),
+          CameraPosition(target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
         ),
       );
     }
@@ -109,6 +99,170 @@ class _MainMapState extends State<MainMap> {
 
   @override
   Widget build(BuildContext context) {
+    print('widget.startCameraPosition: ${widget.startCameraPosition}');
+    if (firstLoad) {
+      //ДОБАВЛЕНИЕ ТОЧЕК В map точек
+      dbMarkers = widget.markersList;
+      for (var dbMarker in widget.markersList) {
+        var dbMarkerId = dbMarker.getMarkerId();
+        markers.add(Marker(
+          icon: customMarkers[dbMarker.markerType],
+          markerId: dbMarkerId,
+          position: dbMarker.coordinates,
+          infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirmsFor}'),
+          onTap: () {},
+        ));
+      }
+      firstLoad = false;
+    }
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.cyanAccent,
+        ),
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: SafeArea(
+          child: Container(
+            color: Colors.white,
+            child: Center(
+              child: Column(
+                children: [
+                  //карта
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.75,
+                    width: MediaQuery.of(context).size.width,
+                    child: GoogleMap(
+                      initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
+                      mapType: MapType.normal,
+                      onMapCreated: _onMapCreated,
+                      myLocationEnabled: true,
+                      markers: markers.toSet(),
+                      mapToolbarEnabled: false,
+                      myLocationButtonEnabled: false,
+                      zoomControlsEnabled: false,
+                      trafficEnabled: true,
+                      onTap: (_) {
+                        setState(() {
+                          ifChangeMarkerInfo = false;
+                        });
+                      },
+                      onCameraMoveStarted: () {
+                        setState(() {
+                          if (!isAutoCameraMove) followLocation = false;
+                        });
+                      },
+                      onCameraIdle: () {
+                        setState(() {
+                          if (isAutoCameraMove) {
+                            followLocation = true;
+                          }
+                          isAutoCameraMove = false;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: (MediaQuery.of(context).size.height * 0.15 - 30 * 2.5) / 2,
+                  ),
+                  (ifChangeMarkerInfo)
+                      ? Align(
+                          alignment: Alignment.bottomCenter,
+                          child: MarkerScale(
+                            markerInfo: changeMarkerInfo,
+                            userDecision: userDecision,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            FloatingActionButton(
+                              onPressed: () {
+                                followLocation = !followLocation;
+                                if (followLocation) {
+                                  isAutoCameraMove = true;
+                                  widget.googleMapController.animateCamera(
+                                    CameraUpdate.newCameraPosition(
+                                      CameraPosition(
+                                          target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                                          zoom: zoomValue,
+                                          tilt: 15.0,
+                                          bearing: 25),
+                                    ),
+                                  );
+                                }
+                                setState(() {});
+                              },
+                              child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
+                            ),
+                            FloatingActionButton(
+                              onPressed: () async {
+                                await addMarker(initialCameraPosition);
+                              },
+                              child: Icon(
+                                Icons.not_listed_location,
+                                size: 30,
+                              ),
+                            )
+                          ],
+                        ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      /*
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: (ifChangeMarkerInfo)
+                    ? MarkerScale(
+                        markerInfo: changeMarkerInfo,
+                        userDecision: userDecision,
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          (ifChangeMarkerInfo)
+                              ? confirmMarkerFAB(changeMarkerInfo)
+                              : FloatingActionButton(
+                                  onPressed: () {
+                                    followLocation = !followLocation;
+                                    if (followLocation) {
+                                      isAutoCameraMove = true;
+                                      _controller.animateCamera(
+                                        CameraUpdate.newCameraPosition(
+                                          CameraPosition(
+                                              target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                                              zoom: zoomValue,
+                                              tilt: 15.0,
+                                              bearing: 25),
+                                        ),
+                                      );
+                                    }
+                                    setState(() {});
+                                  },
+                                  child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
+                                ),
+                          (ifChangeMarkerInfo)
+                              ? subtractMarkerFAB(changeMarkerInfo)
+                              : FloatingActionButton(
+                                  onPressed: () async {
+                                    await addMarker(initialCameraPosition);
+                                  },
+                                  child: Icon(
+                                    Icons.not_listed_location,
+                                    size: 30,
+                                  ),
+                                )
+                        ],
+                      ),
+
+              )
+              */
+    );
+    /*
     return FutureBuilder(
         future: customMarkersMaker(widget.markersList),
         builder: (context, customMarkersMakerSnapshot) {
@@ -128,7 +282,7 @@ class _MainMapState extends State<MainMap> {
                               children: [
                                 //карта
                                 Container(
-                                  height: MediaQuery.of(context).size.height * 0.8,
+                                  height: MediaQuery.of(context).size.height * 0.75,
                                   width: MediaQuery.of(context).size.width,
                                   child: GoogleMap(
                                     initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
@@ -147,8 +301,7 @@ class _MainMapState extends State<MainMap> {
                                     },
                                     onCameraMoveStarted: () {
                                       setState(() {
-                                        if (!isAutoCameraMove)
-                                          followLocation = false;
+                                        if (!isAutoCameraMove) followLocation = false;
                                       });
                                     },
                                     onCameraIdle: () {
@@ -161,39 +314,47 @@ class _MainMapState extends State<MainMap> {
                                     },
                                   ),
                                 ),
-
                                 SizedBox(
-                                  height: 3,
+                                  height: (MediaQuery.of(context).size.height * 0.15 - 30 * 2.5) / 2,
                                 ),
-                                if (_dateTime != null)
-                                  Text(
-                                    "Date/Time: $_dateTime",
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Colors.white,
+                                (ifChangeMarkerInfo) ? Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: MarkerScale(
+                                    markerInfo: changeMarkerInfo,
+                                    userDecision: userDecision,
+                                  ),
+                                ) : Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    FloatingActionButton(
+                                      onPressed: () {
+                                        followLocation = !followLocation;
+                                        if (followLocation) {
+                                          isAutoCameraMove = true;
+                                          _controller.animateCamera(
+                                            CameraUpdate.newCameraPosition(
+                                              CameraPosition(
+                                                  target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                                                  zoom: zoomValue,
+                                                  tilt: 15.0,
+                                                  bearing: 25),
+                                            ),
+                                          );
+                                        }
+                                        setState(() {});
+                                      },
+                                      child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
                                     ),
-                                  ),
-                                SizedBox(
-                                  height: 3,
-                                ),
-                                if (_currentPosition != null)
-                                  Text(
-                                    "Latitude: ${_currentPosition.latitude}, Longitude: ${_currentPosition.longitude}",
-                                    style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.bold),
-                                  ),
-                                SizedBox(
-                                  height: 3,
-                                ),
-                                if (_address != null)
-                                  Text(
-                                    "Address: $_address",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                SizedBox(
-                                  height: 3,
+                                    FloatingActionButton(
+                                      onPressed: () async {
+                                        await addMarker(initialCameraPosition);
+                                      },
+                                      child: Icon(
+                                        Icons.not_listed_location,
+                                        size: 30,
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ],
                             ),
@@ -202,46 +363,59 @@ class _MainMapState extends State<MainMap> {
                       ),
                     )
                   : Center(child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator())),
-              floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+              /*
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
               floatingActionButton: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: (ifChangeMarkerInfo) ? MarkerScale(markerInfo: changeMarkerInfo, userDecision: userDecision,) : Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    (ifChangeMarkerInfo) ? confirmMarkerFAB(changeMarkerInfo) : FloatingActionButton(
-                      onPressed: () {
-                        followLocation = !followLocation;
-                        if (followLocation) {
-                          isAutoCameraMove = true;
-                          _controller.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                  target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
-                                  zoom: zoomValue,
-                                  tilt: 15.0,
-                                  bearing: 25),
-                            ),
-                          );
-                        }
-                        setState(() {});
-                      },
-                      child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
-                    ),
-
-                    (ifChangeMarkerInfo) ? subtractMarkerFAB(changeMarkerInfo) : FloatingActionButton(
-                      onPressed: () async {
-                        await addMarker(initialCameraPosition);
-                      },
-                      child: Icon(
-                        Icons.not_listed_location,
-                        size: 30,
+                child: (ifChangeMarkerInfo)
+                    ? MarkerScale(
+                        markerInfo: changeMarkerInfo,
+                        userDecision: userDecision,
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          (ifChangeMarkerInfo)
+                              ? confirmMarkerFAB(changeMarkerInfo)
+                              : FloatingActionButton(
+                                  onPressed: () {
+                                    followLocation = !followLocation;
+                                    if (followLocation) {
+                                      isAutoCameraMove = true;
+                                      _controller.animateCamera(
+                                        CameraUpdate.newCameraPosition(
+                                          CameraPosition(
+                                              target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                                              zoom: zoomValue,
+                                              tilt: 15.0,
+                                              bearing: 25),
+                                        ),
+                                      );
+                                    }
+                                    setState(() {});
+                                  },
+                                  child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
+                                ),
+                          (ifChangeMarkerInfo)
+                              ? subtractMarkerFAB(changeMarkerInfo)
+                              : FloatingActionButton(
+                                  onPressed: () async {
+                                    await addMarker(initialCameraPosition);
+                                  },
+                                  child: Icon(
+                                    Icons.not_listed_location,
+                                    size: 30,
+                                  ),
+                                )
+                        ],
                       ),
-                    )
-                  ],
-                ),
+
               )
+              */
               );
         });
+
+     */
   }
 
   getLoc() async {
@@ -266,6 +440,7 @@ class _MainMapState extends State<MainMap> {
 
     _currentPosition = await location.getLocation();
     initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+    widget.startCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
 
     location.onLocationChanged.listen((LocationData currentLocation) async {
       prevDot = initialCameraPosition;
@@ -276,15 +451,14 @@ class _MainMapState extends State<MainMap> {
       }
 
       // Zoom при перемещении обратно к геопозиции не меняется, если отдалиться или приблизиться
-      if (_controller!= null) {
-        zoomValue = await _controller.getZoomLevel();
+      if (widget.googleMapController != null) {
+        zoomValue = await widget.googleMapController.getZoomLevel();
       }
       if (followLocation) {
-
         var bearing = calculateBearing(prevDot, LatLng(_currentPosition.latitude, _currentPosition.longitude));
         print(bearing);
         isAutoCameraMove = true;
-        _controller.animateCamera(
+        widget.googleMapController.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
           ),
@@ -293,6 +467,7 @@ class _MainMapState extends State<MainMap> {
 
       _currentPosition = currentLocation;
       initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+      widget.startCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
     });
   }
 
@@ -350,13 +525,10 @@ class _MainMapState extends State<MainMap> {
         onTap: () async {
           if (followLocation) {
             isAutoCameraMove = true;
-            _controller.animateCamera(
+            widget.googleMapController.animateCamera(
               CameraUpdate.newCameraPosition(
                 CameraPosition(
-                    target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
-                    zoom: zoomValue,
-                    tilt: 15.0,
-                    bearing: 25),
+                    target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
               ),
             );
           }
@@ -364,13 +536,11 @@ class _MainMapState extends State<MainMap> {
             if (!ifChangeMarkerInfo) {
               changeMarkerInfo = dbMarker;
               ifChangeMarkerInfo = true;
-            }
-            else{
+            } else {
               if (ifChangeMarkerInfo && (changeMarkerInfo == dbMarker)) {
                 ifChangeMarkerInfo = false;
-                _controller.hideMarkerInfoWindow(dbMarker.getMarkerId());
-              }
-              else{
+                widget.googleMapController.hideMarkerInfoWindow(dbMarker.getMarkerId());
+              } else {
                 changeMarkerInfo = dbMarker;
               }
             }
@@ -381,7 +551,6 @@ class _MainMapState extends State<MainMap> {
     }
 
     setState(() {});
-
   }
 
   // создание метки
@@ -423,7 +592,6 @@ class _MainMapState extends State<MainMap> {
 
   // подтверждение метки
   Future<void> confirmMarker(MarkerInfo markerInfo) async {
-
     // var latLon = await location.getLocation();
     var latLon = markerInfo.coordinates;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
@@ -435,10 +603,11 @@ class _MainMapState extends State<MainMap> {
         timeInSecForIosWeb: 3,
         backgroundColor: Colors.green,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
-    _controller.hideMarkerInfoWindow(markerInfo.getMarkerId());
-    setState(() {ifChangeMarkerInfo = false;});
+        fontSize: 16.0);
+    widget.googleMapController.hideMarkerInfoWindow(markerInfo.getMarkerId());
+    setState(() {
+      ifChangeMarkerInfo = false;
+    });
     await DbMainMethods.uploadPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
     // setState(() {});
@@ -446,7 +615,6 @@ class _MainMapState extends State<MainMap> {
 
   // убавить подтверждения метки
   Future<void> subtractMarker(MarkerInfo markerInfo) async {
-
     // var latLon = await location.getLocation();
     var latLon = markerInfo.coordinates;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
@@ -458,10 +626,11 @@ class _MainMapState extends State<MainMap> {
         timeInSecForIosWeb: 3,
         backgroundColor: Colors.red,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
-    setState(() {ifChangeMarkerInfo = false;});
-    _controller.hideMarkerInfoWindow(markerInfo.getMarkerId());
+        fontSize: 16.0);
+    setState(() {
+      ifChangeMarkerInfo = false;
+    });
+    widget.googleMapController.hideMarkerInfoWindow(markerInfo.getMarkerId());
     await DbMainMethods.subtractPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
     // setState(() {});
@@ -505,5 +674,4 @@ class _MainMapState extends State<MainMap> {
     }
     return atan(x / y) * 360 / (2 * pi);
   }
-
 }
