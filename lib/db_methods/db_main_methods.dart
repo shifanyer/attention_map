@@ -20,12 +20,12 @@ class DbMainMethods {
       if (itemObj?.value == null) {
         newItem.child('coordX').set(pointCoordinates.latitude);
         newItem.child('coordY').set(pointCoordinates.longitude);
-        newItem.child('confirms').set(1);
+        newItem.child('confirms').child('for').set(1);
         newItem.child('creation_time').set(DateTime.now().millisecondsSinceEpoch);
         newItem.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
       }
       else{
-        newItem.child('confirms').set(itemObj.value['confirms'] + 1);
+        newItem.child('confirms').child('for').set(itemObj?.value['confirms']['for'] + 1);
         newItem.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
       }
     }
@@ -35,10 +35,13 @@ class DbMainMethods {
     var pointType = EnumMethods.enumToString(markerType);
     var markerId = (pointCoordinates.latitude * 1000).truncate().toString() + (pointCoordinates.longitude * 1000).truncate().toString();
     for (var center in centers) {
-      var newItem = FirebaseDatabase.instance.reference().child(center).child(pointType).child(markerId);
+      var newItem = FirebaseDatabase.instance.reference().child(center).child(pointType).child(markerId).child('confirms').child('against');
       var itemObj = await newItem.once();
       if (itemObj?.value != null) {
-        newItem.child('confirms').set(itemObj.value['confirms'] - 1);
+        newItem.set(itemObj.value + 1);
+      }
+      else {
+        newItem.set(1);
       }
     }
   }
@@ -55,12 +58,14 @@ class DbMainMethods {
         var typedMap = radiusSnapshot?.value[EnumMethods.enumToString(markerType)] ?? {};
         for (var point in typedMap?.values ?? []) {
           var pointCoordinates = LatLng(point['coordX'] * 1.0, point['coordY'] * 1.0);
-          var confirmsNumber = point['confirms'];
+          var confirmsForNumber = point['confirms']['for'];
+          var confirmsAgainstNumber = point['confirms']['against'];
           var lastTimeConfirmation = point['last_confirm_time'];
           var newPoint = MarkerInfo(
               markerType: markerType,
               coordinates: pointCoordinates,
-              confirms: confirmsNumber,
+              confirmsFor: confirmsForNumber,
+              confirmsAgainst: confirmsAgainstNumber,
               lastTimeConfirmation: lastTimeConfirmation);
           markers.add(newPoint);
         }

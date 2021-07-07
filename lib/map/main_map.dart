@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:attention_map/db_methods/db_main_methods.dart';
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
+import 'package:attention_map/map_objects/marker_scale.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -34,11 +36,13 @@ class _MainMapState extends State<MainMap> {
   var centersSet = <String>{};
   bool firstLoad = true;
   List<MarkerInfo> dbMarkers = [];
+  Map<MarkerId, int> userDecision = {};
   double zoomValue = 17.0;
   bool followLocation = true;
   bool isAutoCameraMove = true;
   MarkerInfo changeMarkerInfo;
   bool ifChangeMarkerInfo = false;
+  LatLng prevDot;
 
   // Marker marker;
   Location location = Location();
@@ -78,7 +82,7 @@ class _MainMapState extends State<MainMap> {
           icon: customMarkers[dbMarker.markerType],
           markerId: dbMarkerId,
           position: dbMarker.coordinates,
-          infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirms}'),
+          infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirmsFor}'),
           onTap: () {},
         ));
       }
@@ -118,7 +122,7 @@ class _MainMapState extends State<MainMap> {
                       width: MediaQuery.of(context).size.width,
                       child: SafeArea(
                         child: Container(
-                          color: Colors.blueGrey.withOpacity(.8),
+                          color: Colors.white,
                           child: Center(
                             child: Column(
                               children: [
@@ -201,7 +205,7 @@ class _MainMapState extends State<MainMap> {
               floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
               floatingActionButton: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Row(
+                child: (ifChangeMarkerInfo) ? MarkerScale(markerInfo: changeMarkerInfo, userDecision: userDecision,) : Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     (ifChangeMarkerInfo) ? confirmMarkerFAB(changeMarkerInfo) : FloatingActionButton(
@@ -223,6 +227,7 @@ class _MainMapState extends State<MainMap> {
                       },
                       child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
                     ),
+
                     (ifChangeMarkerInfo) ? subtractMarkerFAB(changeMarkerInfo) : FloatingActionButton(
                       onPressed: () async {
                         await addMarker(initialCameraPosition);
@@ -263,6 +268,7 @@ class _MainMapState extends State<MainMap> {
     initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
 
     location.onLocationChanged.listen((LocationData currentLocation) async {
+      prevDot = initialCameraPosition;
       Set<String> updatedCentersSet = getCentersSet(currentLocation);
       if (!centersSet.containsAll(updatedCentersSet)) {
         centersSet = updatedCentersSet;
@@ -273,11 +279,10 @@ class _MainMapState extends State<MainMap> {
       if (_controller!= null) {
         zoomValue = await _controller.getZoomLevel();
       }
-      var showRegionBorders = await _controller.getVisibleRegion();
-      var centerOfRegion = LatLng((showRegionBorders.northeast.latitude + showRegionBorders.southwest.latitude) / 2,
-          (showRegionBorders.northeast.longitude + showRegionBorders.southwest.longitude) / 2);
-
       if (followLocation) {
+
+        var bearing = calculateBearing(prevDot, LatLng(_currentPosition.latitude, _currentPosition.longitude));
+        print(bearing);
         isAutoCameraMove = true;
         _controller.animateCamera(
           CameraUpdate.newCameraPosition(
@@ -340,8 +345,8 @@ class _MainMapState extends State<MainMap> {
         icon: customMarkers[dbMarker.markerType],
         markerId: dbMarkerId,
         position: dbMarker.coordinates,
-        visible: dbMarker.confirms > 0,
-        infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirms}'),
+        visible: dbMarker.confirmsFor > 0,
+        infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirmsFor}'),
         onTap: () async {
           if (followLocation) {
             isAutoCameraMove = true;
@@ -490,6 +495,15 @@ class _MainMapState extends State<MainMap> {
       child: Icon(Icons.arrow_downward_outlined),
       backgroundColor: Colors.redAccent,
     );
+  }
+
+  double calculateBearing(LatLng prevDot, LatLng curDot) {
+    var x = curDot.latitude - prevDot.latitude;
+    var y = curDot.longitude - prevDot.longitude;
+    if (y == 0) {
+      return 25;
+    }
+    return atan(x / y) * 360 / (2 * pi);
   }
 
 }

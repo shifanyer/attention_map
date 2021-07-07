@@ -69,6 +69,8 @@ flutter:
     - assets/dtp_marker.png
     - assets/help_marker.png
     - assets/danger_marker.png
+    - assets/likeUPD.png
+    - assets/dislikeUPD.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
