@@ -99,7 +99,6 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
   @override
   Widget build(BuildContext context) {
-    print('widget.startCameraPosition: ${widget.startCameraPosition}');
     if (firstLoad) {
       //ДОБАВЛЕНИЕ ТОЧЕК В map точек
       dbMarkers = widget.markersList;
@@ -129,38 +128,48 @@ class _MainMapState extends State<MainMap> with MapHelper {
               child: Column(
                 children: [
                   //карта
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.75,
-                    width: MediaQuery.of(context).size.width,
-                    child: GoogleMap(
-                      initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
-                      mapType: MapType.normal,
-                      onMapCreated: _onMapCreated,
-                      myLocationEnabled: true,
-                      markers: markers.toSet(),
-                      mapToolbarEnabled: false,
-                      myLocationButtonEnabled: false,
-                      zoomControlsEnabled: false,
-                      trafficEnabled: true,
-                      onTap: (_) {
-                        setState(() {
-                          ifChangeMarkerInfo = false;
-                        });
-                      },
-                      onCameraMoveStarted: () {
-                        setState(() {
-                          if (!isAutoCameraMove) followLocation = false;
-                        });
-                      },
-                      onCameraIdle: () {
-                        setState(() {
-                          if (isAutoCameraMove) {
-                            followLocation = true;
-                          }
-                          isAutoCameraMove = false;
-                        });
-                      },
-                    ),
+                  Stack(
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height * 0.75,
+                        width: MediaQuery.of(context).size.width,
+                        child: GoogleMap(
+                          initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
+                          compassEnabled: false,
+                          mapType: MapType.normal,
+                          onMapCreated: _onMapCreated,
+                          myLocationEnabled: true,
+                          markers: markers.toSet(),
+                          mapToolbarEnabled: false,
+                          myLocationButtonEnabled: false,
+                          zoomControlsEnabled: false,
+                          trafficEnabled: true,
+                          onTap: (_) {
+                            setState(() {
+                              ifChangeMarkerInfo = false;
+                            });
+                          },
+                          onCameraMoveStarted: () {
+                            setState(() {
+                              if (!isAutoCameraMove) followLocation = false;
+                            });
+                          },
+                          onCameraIdle: () {
+                            setState(() {
+                              if (isAutoCameraMove) {
+                                followLocation = true;
+                              }
+                              isAutoCameraMove = false;
+                            });
+                          },
+                        ),
+                      ),
+
+                      IconButton(icon: Icon(Icons.search), onPressed: () {print('ZOOM map');}),
+                      Align(
+                        alignment: Alignment.topRight,
+                          child: IconButton(icon: Icon(Icons.filter_alt), onPressed: () {print('Filters');})),
+                    ],
                   ),
                   SizedBox(
                     height: (MediaQuery.of(context).size.height * 0.15 - 30 * 2.5) / 2,
