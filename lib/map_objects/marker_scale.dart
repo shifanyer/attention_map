@@ -33,7 +33,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
     spaceBetween = 25.0;
     lineHeight = 12.0;
     confirmsFor = widget.markerInfo.confirmsFor;
-    confirmsAgainst = widget.markerInfo.confirmsAgainst;
+    confirmsAgainst = widget?.markerInfo?.confirmsAgainst ?? 0;
     lineLength = MediaQuery.of(context).size.width - boxSize * 5 - spaceBetween * 2 - 10.0;
     var forPercent = confirmsFor / (confirmsFor + confirmsAgainst);
     return Container(
