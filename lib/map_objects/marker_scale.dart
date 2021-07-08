@@ -1,4 +1,5 @@
 import 'package:attention_map/map_objects/marker_point.dart';
+import 'package:attention_map/themes/theme_one.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,7 +14,7 @@ class MarkerScale extends StatefulWidget {
   _MarkerScaleState createState() => _MarkerScaleState();
 }
 
-class _MarkerScaleState extends State<MarkerScale> {
+class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
   double boxSize;
   double spaceBetween;
   double lineHeight;
@@ -23,7 +24,6 @@ class _MarkerScaleState extends State<MarkerScale> {
 
   @override
   void initState() {
-    print(widget.markerInfo.markerType);
     super.initState();
   }
 
@@ -52,9 +52,8 @@ class _MarkerScaleState extends State<MarkerScale> {
                       widget.markerInfo.confirmsFor += 1;
                       widget.userDecision[widget.markerInfo.getMarkerId()] = 1;
                     });
-                    print('pressed for');
                   },
-                  backgroundColor: Color(0xff33ff33),
+                  backgroundColor: forColor,
                   child: Container(width: boxSize, height: boxSize, child: Image.asset('assets/likeUPD.png', fit: BoxFit.fill)),
                 ),
               ),
@@ -93,11 +92,11 @@ class _MarkerScaleState extends State<MarkerScale> {
                       children: [
                         if ((forPercent >= 0.5))
                           Container(
-                            decoration: BoxDecoration(color: Color(0xffff0000), borderRadius: BorderRadius.all(Radius.circular(5))),
+                            decoration: BoxDecoration(color: againstColor, borderRadius: BorderRadius.all(Radius.circular(5))),
                           ),
                         Container(
                           width: lineLength * ((forPercent < 0.5) ? 1 : forPercent),
-                          decoration: BoxDecoration(color: Color(0xff33ff33), borderRadius: BorderRadius.all(Radius.circular(5))),
+                          decoration: BoxDecoration(color: forColor, borderRadius: BorderRadius.all(Radius.circular(5))),
                         ),
                         if (forPercent < 0.5)
                           Row(
@@ -110,7 +109,7 @@ class _MarkerScaleState extends State<MarkerScale> {
                               ),
                               Container(
                                 width: lineLength * (1 - forPercent),
-                                decoration: BoxDecoration(color: Color(0xffff0000), borderRadius: BorderRadius.all(Radius.circular(5))),
+                                decoration: BoxDecoration(color: againstColor, borderRadius: BorderRadius.all(Radius.circular(5))),
                               ),
                             ],
                           ),
@@ -133,9 +132,8 @@ class _MarkerScaleState extends State<MarkerScale> {
                       widget.markerInfo.confirmsAgainst += 1;
                       widget.userDecision[widget.markerInfo.getMarkerId()] = -1;
                     });
-                    print('pressed for');
                   },
-                  backgroundColor: Color(0xffff0000),
+                  backgroundColor: againstColor,
                   child: Container(width: boxSize, height: boxSize, child: Image.asset('assets/dislikeUPD.png', fit: BoxFit.fill)),
                 ),
               ),
