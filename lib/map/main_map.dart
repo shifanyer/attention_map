@@ -5,6 +5,7 @@ import 'package:attention_map/db_methods/db_main_methods.dart';
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/filters/marker_filters.dart';
+import 'package:attention_map/map_objects/marker_page.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:attention_map/map_objects/marker_scale.dart';
 import 'package:flutter/cupertino.dart';
@@ -50,25 +51,9 @@ class _MainMapState extends State<MainMap> with MapHelper {
   bool ifChangeMarkerInfo = false;
   LatLng prevDot;
 
-  static const typesList = [
-    'Камера',
-    'Достопримечательность',
-    'Пост ДПС',
-    'Опасный участок дороги',
-    'ДТП',
-    'Нужна помощь',
-    'Другое'
-  ];
+  static const typesList = ['Камера', 'Достопримечательность', 'Пост ДПС', 'Опасный участок дороги', 'ДТП', 'Нужна помощь', 'Другое'];
 
-  var filtersList = [
-    true,
-    true,
-    true,
-    true,
-    true,
-    true,
-    true
-  ];
+  var filtersList = [true, true, true, true, true, true, true];
 
   static List<MarkerType> markerTypesList = [
     MarkerType.camera,
@@ -162,14 +147,8 @@ class _MainMapState extends State<MainMap> with MapHelper {
         decoration: BoxDecoration(
           color: Colors.cyanAccent,
         ),
-        height: MediaQuery
-            .of(context)
-            .size
-            .height,
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
         child: SafeArea(
           child: Container(
             color: Colors.white,
@@ -182,14 +161,8 @@ class _MainMapState extends State<MainMap> with MapHelper {
                     child: Stack(
                       children: [
                         Container(
-                          height: MediaQuery
-                              .of(context)
-                              .size
-                              .height * 0.75,
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width,
+                          height: MediaQuery.of(context).size.height * 0.75,
+                          width: MediaQuery.of(context).size.width,
                           child: GoogleMap(
                             initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
                             compassEnabled: false,
@@ -227,8 +200,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
                               Navigator.push(
                                   context,
                                   CupertinoPageRoute(
-                                      builder: (context) =>
-                                          FullMap(
+                                      builder: (context) => FullMap(
                                             initialCameraPosition: widget.startCameraPosition,
                                             zoomValue: zoomValue,
                                             onMapCreated: _onMapCreated,
@@ -248,23 +220,16 @@ class _MainMapState extends State<MainMap> with MapHelper {
                                   await Navigator.push(
                                       context,
                                       CupertinoPageRoute(
-                                          builder: (context) =>
-                                          MarkerFilters(
-                                            filters: filtersList,
-                                            filtersNames: typesList,
-                                          )));
+                                          builder: (context) => MarkerFilters(
+                                                filters: filtersList,
+                                                filtersNames: typesList,
+                                              )));
                                   updateMarkers();
                                   print('Filters');
                                 })),
                         Padding(
                           padding:
-                          EdgeInsets.only(top: MediaQuery
-                              .of(context)
-                              .size
-                              .height * 0.75 - 80, left: MediaQuery
-                              .of(context)
-                              .size
-                              .width * 1 - 80),
+                              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.75 - 80, left: MediaQuery.of(context).size.width * 1 - 80),
                           child: Container(
                             width: 60,
                             height: 60,
@@ -299,10 +264,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
                   ),
                   if (ifChangeMarkerInfo)
                     SizedBox(
-                      height: (MediaQuery
-                          .of(context)
-                          .size
-                          .height * 0.15 - 30 * 2.5) / 2,
+                      height: (MediaQuery.of(context).size.height * 0.15 - 30 * 2.5) / 2,
                     ),
                   if (ifChangeMarkerInfo)
                     Align(
@@ -314,28 +276,23 @@ class _MainMapState extends State<MainMap> with MapHelper {
                     ),
                   if (!ifChangeMarkerInfo)
                     Container(
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.1,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: typesList.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return GestureDetector(
-                          onTap: () async {
-                            await addMarker(initialCameraPosition, pointType: markerTypesList[index]);
-                            print(typesList[index].toString());
-                          },
-                          child: Card(
-                            child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: Image.asset(markerImageAssets[index])),
-                          ),
-                        );
-                      },
-                    ),
-                    /*
+                      height: MediaQuery.of(context).size.height * 0.1,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: typesList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return GestureDetector(
+                            onTap: () async {
+                              await addMarker(initialCameraPosition, pointType: markerTypesList[index]);
+                              print(typesList[index].toString());
+                            },
+                            child: Card(
+                              child: Padding(padding: const EdgeInsets.all(15.0), child: Image.asset(markerImageAssets[index])),
+                            ),
+                          );
+                        },
+                      ),
+                      /*
                     ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
@@ -362,7 +319,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
                       ],
                     ),
                     */
-                  ),
+                    ),
                   /*
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -482,11 +439,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
     for (var center in centersList) {
       if (((center.latitude - currentLocation.latitude).abs() <= 0.51) && ((center.longitude - currentLocation.longitude).abs() <= 0.51)) {
-        resSet.add(((center.latitude * 10).toString())
-            .split('.')
-            .first + ((center.longitude * 10).toString())
-            .split('.')
-            .first);
+        resSet.add(((center.latitude * 10).toString()).split('.').first + ((center.longitude * 10).toString()).split('.').first);
       }
     }
 
@@ -515,6 +468,13 @@ class _MainMapState extends State<MainMap> with MapHelper {
         visible: (dbMarker.confirmsFor > 0) && (filtersList[markerTypesList.indexOf(dbMarker.markerType)]),
         infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirmsFor}'),
         onTap: () async {
+          Navigator.push(
+              context,
+              CupertinoPageRoute(
+                  builder: (context) =>
+                      MarkerPage(markerInfo: dbMarker, imagePath: markerImageAssets[markerTypesList.indexOf(dbMarker.markerType)])));
+          return;
+
           if (followLocation) {
             isAutoCameraMove = true;
             widget.googleMapController.animateCamera(

@@ -8,7 +8,7 @@ class MarkerScale extends StatefulWidget {
   MarkerInfo markerInfo;
   Map<MarkerId, int> userDecision;
 
-  MarkerScale({Key key, @required this.markerInfo, @required this.userDecision}) : super(key: key);
+  MarkerScale({Key key, @required this.markerInfo, this.userDecision = const {}}) : super(key: key);
 
   @override
   _MarkerScaleState createState() => _MarkerScaleState();

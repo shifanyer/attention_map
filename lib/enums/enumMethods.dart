@@ -24,6 +24,24 @@ class EnumMethods {
     }
   }
 
+  static String translate(dynamic enumMember) {
+    Map<MarkerType, String> descriptions = {
+      MarkerType.camera : 'Камера',
+      MarkerType.other : 'Другое',
+      MarkerType.help : 'Помощь',
+      MarkerType.dtp : 'ДТП',
+      MarkerType.danger : 'Опасность',
+      MarkerType.dps : 'ДПС',
+      MarkerType.monument : 'Достопримечательность',
+    };
+    if (descriptions.containsKey(enumMember)){
+      return descriptions[enumMember];
+    }
+    else {
+      return '-';
+    }
+  }
+
 
 
 }
