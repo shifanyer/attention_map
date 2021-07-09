@@ -6,9 +6,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MarkerScale extends StatefulWidget {
   MarkerInfo markerInfo;
-  Map<MarkerId, int> userDecision;
+  Map<MarkerId, int> userDecisions;
 
-  MarkerScale({Key key, @required this.markerInfo, this.userDecision = const {}}) : super(key: key);
+  MarkerScale({Key key, @required this.markerInfo, this.userDecisions = const {}}) : super(key: key);
 
   @override
   _MarkerScaleState createState() => _MarkerScaleState();
@@ -50,7 +50,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                     setState(() {
                       confirmsFor++;
                       widget.markerInfo.confirmsFor += 1;
-                      widget.userDecision[widget.markerInfo.getMarkerId()] = 1;
+                      widget.userDecisions[widget.markerInfo.getMarkerId()] = 1;
                     });
                   },
                   backgroundColor: forColor,
@@ -65,7 +65,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 height: 5,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: (widget.userDecision[widget.markerInfo.getMarkerId()] == 1) ? Colors.black : Colors.transparent,
+                  color: (widget.userDecisions[widget.markerInfo.getMarkerId()] == 1) ? Colors.black : Colors.transparent,
                 ),
               ),
             ],
@@ -130,7 +130,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                     setState(() {
                       confirmsAgainst++;
                       widget.markerInfo.confirmsAgainst += 1;
-                      widget.userDecision[widget.markerInfo.getMarkerId()] = -1;
+                      widget.userDecisions[widget.markerInfo.getMarkerId()] = -1;
                     });
                   },
                   backgroundColor: againstColor,
@@ -145,7 +145,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 height: 5,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: (widget.userDecision[widget.markerInfo.getMarkerId()] == -1) ? Colors.black : Colors.transparent,
+                  color: (widget.userDecisions[widget.markerInfo.getMarkerId()] == -1) ? Colors.black : Colors.transparent,
                 ),
               ),
             ],

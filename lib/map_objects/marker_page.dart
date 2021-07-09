@@ -6,9 +6,10 @@ import 'package:flutter/material.dart';
 
 class MarkerPage extends StatelessWidget {
   final MarkerInfo markerInfo;
+  Map userDecisions;
   final String imagePath;
 
-  const MarkerPage({Key key, @required this.markerInfo, @required this.imagePath}) : super(key: key);
+  MarkerPage({Key key, @required this.markerInfo, @required this.userDecisions, @required this.imagePath}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +148,7 @@ class MarkerPage extends StatelessWidget {
                   alignment: Alignment.bottomCenter,
                   child: MarkerScale(
                     markerInfo: markerInfo,
+                      userDecisions: userDecisions
                   )),
             ),
 

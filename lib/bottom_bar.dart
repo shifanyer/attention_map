@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'enums/marker_type.dart';
 import 'map/main_map.dart';
 import 'map_objects/marker_point.dart';
+import 'my_markers/my_markers.dart';
 
 /// This is the stateful widget that the main application instantiates.
 class BottomBar extends StatefulWidget {
@@ -39,13 +40,11 @@ class _BottomBarState extends State<BottomBar> {
 
   LatLng startCameraPosition = LatLng(59.666999, 51.58008);
   List<Widget> widgetOptions;
+
   @override
   void initState() {
     widgetOptions = <Widget>[
-      Text(
-        'Index 0: Home',
-        style: optionStyle,
-      ),
+      MyMarkers(),
       MainMap(
         startCameraPosition: startCameraPosition,
         customMarkers: widget.markers,

@@ -43,7 +43,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
   var centersSet = <String>{};
   bool firstLoad = true;
   List<MarkerInfo> dbMarkers = [];
-  Map<MarkerId, int> userDecision = {};
+  Map<MarkerId, int> userDecisions = {};
   double zoomValue = 17.0;
   bool followLocation = true;
   bool isAutoCameraMove = true;
@@ -271,7 +271,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
                       alignment: Alignment.bottomCenter,
                       child: MarkerScale(
                         markerInfo: changeMarkerInfo,
-                        userDecision: userDecision,
+                        userDecisions: userDecisions,
                       ),
                     ),
                   if (!ifChangeMarkerInfo)
@@ -471,8 +471,10 @@ class _MainMapState extends State<MainMap> with MapHelper {
           Navigator.push(
               context,
               CupertinoPageRoute(
-                  builder: (context) =>
-                      MarkerPage(markerInfo: dbMarker, imagePath: markerImageAssets[markerTypesList.indexOf(dbMarker.markerType)])));
+                  builder: (context) => MarkerPage(
+                      markerInfo: dbMarker,
+                      userDecisions: userDecisions,
+                      imagePath: markerImageAssets[markerTypesList.indexOf(dbMarker.markerType)])));
           return;
 
           if (followLocation) {
