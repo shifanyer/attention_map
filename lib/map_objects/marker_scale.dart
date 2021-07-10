@@ -52,6 +52,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 child: FloatingActionButton(
                   onPressed: () {
                     setState(() {
+                      //TODO Добавить запись в БД
                       if (globals.userDecisions[widget.markerInfo.getMarkerId()] != 1) {
                         if (globals.userDecisions[widget.markerInfo.getMarkerId()] == -1) {
                           confirmsAgainst--;
@@ -142,6 +143,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 child: FloatingActionButton(
                   onPressed: () {
                     setState(() {
+                      //TODO Добавить запись в БД
                       if (globals.userDecisions[widget.markerInfo.getMarkerId()] != -1) {
                         if (globals.userDecisions[widget.markerInfo.getMarkerId()] == 1) {
                           confirmsFor--;
