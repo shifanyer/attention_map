@@ -5,6 +5,7 @@ import 'enums/marker_type.dart';
 import 'map/main_map.dart';
 import 'map_objects/marker_point.dart';
 import 'my_markers/my_markers.dart';
+import 'global/globals.dart' as globals;
 
 /// This is the stateful widget that the main application instantiates.
 class BottomBar extends StatefulWidget {
@@ -57,7 +58,6 @@ class _BottomBarState extends State<BottomBar> {
       ),
     ];
     // startCameraPosition = ;
-    // TODO: implement initState
     super.initState();
   }
 
@@ -76,24 +76,27 @@ class _BottomBarState extends State<BottomBar> {
       body: Center(
         child: widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assistant_photo),
-            label: 'Markers',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.location_pin),
-            label: 'Map',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
+      bottomNavigationBar: SizedBox(
+        height: globals.bottomHeight,
+        child: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.assistant_photo),
+              label: 'Markers',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.location_pin),
+              label: 'Map',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.amber[800],
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }

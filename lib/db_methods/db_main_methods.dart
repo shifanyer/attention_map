@@ -58,8 +58,8 @@ class DbMainMethods {
         var typedMap = radiusSnapshot?.value[EnumMethods.enumToString(markerType)] ?? {};
         for (var point in typedMap?.values ?? []) {
           var pointCoordinates = LatLng(point['coordX'] * 1.0, point['coordY'] * 1.0);
-          var confirmsForNumber = point['confirms']['for'];
-          var confirmsAgainstNumber = point['confirms']['against'];
+          var confirmsForNumber = point['confirms']['for'] ?? 0;
+          var confirmsAgainstNumber = point['confirms']['against'] ?? 0;
           var lastTimeConfirmation = point['last_confirm_time'];
           var newPoint = MarkerInfo(
               markerType: markerType,

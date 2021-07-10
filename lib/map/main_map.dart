@@ -21,6 +21,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'bottom_choose_list.dart';
 import 'full_map.dart';
 import 'map_helper.dart';
+import '../global/globals.dart' as globals;
 
 class MainMap extends StatefulWidget {
   LatLng startCameraPosition;
@@ -50,6 +51,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
   MarkerInfo changeMarkerInfo;
   bool ifChangeMarkerInfo = false;
   LatLng prevDot;
+  Set<Circle> circles = {};
 
   static const typesList = ['Камера', 'Достопримечательность', 'Пост ДПС', 'Опасный участок дороги', 'ДТП', 'Нужна помощь', 'Другое'];
 
@@ -81,14 +83,16 @@ class _MainMapState extends State<MainMap> with MapHelper {
   // LatLng initialCameraPosition = LatLng(59.666999, 51.58008);
   LatLng initialCameraPosition;
 
+  bool showMarkersList;
+
   @override
   void initState() {
+    showMarkersList = true;
     customMarkers = widget.customMarkers;
     initialCameraPosition = widget.startCameraPosition;
     if (widget?.startCameraPosition != null) {
       initialCameraPosition = widget.startCameraPosition;
     }
-    // TODO: implement initState
     getLoc();
     super.initState();
   }
@@ -150,214 +154,208 @@ class _MainMapState extends State<MainMap> with MapHelper {
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: SafeArea(
-          child: Container(
-            color: Colors.white,
-            child: Center(
-              child: Column(
-                children: [
-                  //карта
-                  Hero(
-                    tag: 'map tag',
-                    child: Stack(
-                      children: [
-                        Container(
-                          height: MediaQuery.of(context).size.height * 0.75,
-                          width: MediaQuery.of(context).size.width,
-                          child: GoogleMap(
-                            initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
-                            compassEnabled: false,
-                            mapType: MapType.normal,
-                            onMapCreated: _onMapCreated,
-                            myLocationEnabled: true,
-                            markers: markers.toSet(),
-                            mapToolbarEnabled: false,
-                            myLocationButtonEnabled: false,
-                            zoomControlsEnabled: false,
-                            trafficEnabled: true,
-                            onTap: (_) {
-                              setState(() {
-                                ifChangeMarkerInfo = false;
-                              });
-                            },
-                            onCameraMoveStarted: () {
-                              setState(() {
-                                if (!isAutoCameraMove) followLocation = false;
-                              });
-                            },
-                            onCameraIdle: () {
-                              setState(() {
-                                if (isAutoCameraMove) {
-                                  followLocation = true;
-                                }
-                                isAutoCameraMove = false;
-                              });
-                            },
-                          ),
-                        ),
-                        IconButton(
-                            icon: Icon(Icons.search),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                      builder: (context) => FullMap(
-                                            initialCameraPosition: widget.startCameraPosition,
-                                            zoomValue: zoomValue,
-                                            onMapCreated: _onMapCreated,
-                                            markers: markers.toSet(),
-                                            ifChangeMarkerInfo: ifChangeMarkerInfo,
-                                            isAutoCameraMove: isAutoCameraMove,
-                                            followLocation: followLocation,
-                                            googleMapController: widget.googleMapController,
-                                            location: location,
-                                          )));
-                            }),
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: IconButton(
-                                icon: Icon(Icons.filter_alt),
-                                onPressed: () async {
-                                  await Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                          builder: (context) => MarkerFilters(
-                                                filters: filtersList,
-                                                filtersNames: typesList,
-                                              )));
-                                  updateMarkers();
-                                  print('Filters');
-                                })),
-                        Padding(
-                          padding:
-                              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.75 - 80, left: MediaQuery.of(context).size.width * 1 - 80),
-                          child: Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                            child: IconButton(
-                              onPressed: () {
-                                followLocation = !followLocation;
-                                if (followLocation) {
-                                  isAutoCameraMove = true;
-                                  widget.googleMapController.animateCamera(
-                                    CameraUpdate.newCameraPosition(
-                                      CameraPosition(
-                                          target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
-                                          zoom: zoomValue,
-                                          tilt: 15.0,
-                                          bearing: 25),
-                                    ),
-                                  );
-                                }
-                                setState(() {});
+          child: LayoutBuilder(
+            builder: (BuildContext safeAreaContext, BoxConstraints constraints) {
+              return Container(
+                color: Colors.white,
+                child: Center(
+                  child: Column(
+                    children: [
+                      //карта
+                      Stack(
+                        children: [
+                          Container(
+                            // height: MediaQuery.of(safeAreaContext).size.height * 0.75,
+                            height: (showMarkersList) ? MediaQuery.of(safeAreaContext).size.height * 0.75 : constraints.maxHeight,
+                            width: MediaQuery.of(context).size.width,
+                            child: GoogleMap(
+                              initialCameraPosition: CameraPosition(target: initialCameraPosition, zoom: zoomValue),
+                              compassEnabled: false,
+                              mapType: MapType.normal,
+                              onMapCreated: _onMapCreated,
+                              myLocationEnabled: true,
+                              markers: markers.toSet(),
+                              circles: circles,
+                              mapToolbarEnabled: false,
+                              myLocationButtonEnabled: false,
+                              zoomControlsEnabled: false,
+                              trafficEnabled: true,
+                              onTap: (_) {
+                                setState(() {
+                                  ifChangeMarkerInfo = false;
+                                });
                               },
-                              icon: Icon(
-                                Icons.adjust,
-                                color: followLocation ? Colors.black : Colors.white70,
-                                size: 30,
+                              onCameraMoveStarted: () {
+                                setState(() {
+                                  if (!isAutoCameraMove) followLocation = false;
+                                });
+                              },
+                              onCameraIdle: () {
+                                setState(() {
+                                  if (isAutoCameraMove) {
+                                    followLocation = true;
+                                  }
+                                  isAutoCameraMove = false;
+                                });
+                              },
+                            ),
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.search),
+                              onPressed: () {
+                                setState(() {
+                                  showMarkersList = !showMarkersList;
+                                });
+                              }),
+                          Align(
+                              alignment: Alignment.topRight,
+                              child: IconButton(
+                                  icon: Icon(Icons.filter_alt),
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                        context,
+                                        CupertinoPageRoute(
+                                            builder: (context) => MarkerFilters(
+                                                  filters: filtersList,
+                                                  filtersNames: typesList,
+                                                )));
+                                    updateMarkers();
+                                    print('Filters');
+                                  })),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: ((showMarkersList) ? MediaQuery.of(safeAreaContext).size.height * 0.75 : constraints.maxHeight) - 80,
+                                left: MediaQuery.of(context).size.width * 1 - 80),
+                            child: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+                              child: IconButton(
+                                onPressed: () {
+                                  followLocation = !followLocation;
+                                  if (followLocation) {
+                                    isAutoCameraMove = true;
+                                    widget.googleMapController.animateCamera(
+                                      CameraUpdate.newCameraPosition(
+                                        CameraPosition(
+                                            target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                                            zoom: zoomValue,
+                                            tilt: 15.0,
+                                            bearing: 25),
+                                      ),
+                                    );
+                                  }
+                                  setState(() {});
+                                },
+                                icon: Icon(
+                                  Icons.adjust,
+                                  color: followLocation ? Colors.black : Colors.white70,
+                                  size: 30,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (ifChangeMarkerInfo)
-                    SizedBox(
-                      height: (MediaQuery.of(context).size.height * 0.15 - 30 * 2.5) / 2,
-                    ),
-                  if (ifChangeMarkerInfo)
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: MarkerScale(
-                        markerInfo: changeMarkerInfo,
-                        userDecisions: userDecisions,
+                        ],
                       ),
-                    ),
-                  if (!ifChangeMarkerInfo)
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.1,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: typesList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return GestureDetector(
-                            onTap: () async {
-                              await addMarker(initialCameraPosition, pointType: markerTypesList[index]);
-                              print(typesList[index].toString());
-                            },
-                            child: Card(
-                              child: Padding(padding: const EdgeInsets.all(15.0), child: Image.asset(markerImageAssets[index])),
+                      if (ifChangeMarkerInfo)
+                        SizedBox(
+                          height: (MediaQuery.of(context).size.height * 0.15 - 30 * 2.5) / 2,
+                        ),
+                      if (ifChangeMarkerInfo)
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: MarkerScale(
+                            markerInfo: changeMarkerInfo,
+                          ),
+                        ),
+                      if (showMarkersList)
+                        if (!ifChangeMarkerInfo)
+                          Container(
+                            height: MediaQuery.of(context).size.height * 0.1,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: typesList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () async {
+                                    await addMarker(initialCameraPosition, pointType: markerTypesList[index]);
+                                    print(typesList[index].toString());
+                                  },
+                                  child: Card(
+                                    child: Padding(padding: const EdgeInsets.all(15.0), child: Image.asset(markerImageAssets[index])),
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
+                            /*
+                      ListView(
+                        scrollDirection: Axis.horizontal,
+                        children: [
+                          Container(
+                            width: 160.0,
+                            color: Colors.red,
+                          ),
+                          Container(
+                            width: 160.0,
+                            color: Colors.blue,
+                          ),
+                          Container(
+                            width: 160.0,
+                            color: Colors.green,
+                          ),
+                          Container(
+                            width: 160.0,
+                            color: Colors.yellow,
+                          ),
+                          Container(
+                            width: 160.0,
+                            color: Colors.orange,
+                          ),
+                        ],
                       ),
+                      */
+                          ),
+
                       /*
-                    ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        Container(
-                          width: 160.0,
-                          color: Colors.red,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        FloatingActionButton(
+                          onPressed: () {
+                            followLocation = !followLocation;
+                            if (followLocation) {
+                              isAutoCameraMove = true;
+                              widget.googleMapController.animateCamera(
+                                CameraUpdate.newCameraPosition(
+                                  CameraPosition(
+                                      target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
+                                      zoom: zoomValue,
+                                      tilt: 15.0,
+                                      bearing: 25),
+                                ),
+                              );
+                            }
+                            setState(() {});
+                          },
+                          child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
                         ),
-                        Container(
-                          width: 160.0,
-                          color: Colors.blue,
-                        ),
-                        Container(
-                          width: 160.0,
-                          color: Colors.green,
-                        ),
-                        Container(
-                          width: 160.0,
-                          color: Colors.yellow,
-                        ),
-                        Container(
-                          width: 160.0,
-                          color: Colors.orange,
-                        ),
+                        FloatingActionButton(
+                          onPressed: () async {
+                            await addMarker(initialCameraPosition);
+                          },
+                          child: Icon(
+                            Icons.not_listed_location,
+                            size: 30,
+                          ),
+                        )
                       ],
-                    ),
+                    )
                     */
-                    ),
-                  /*
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      FloatingActionButton(
-                        onPressed: () {
-                          followLocation = !followLocation;
-                          if (followLocation) {
-                            isAutoCameraMove = true;
-                            widget.googleMapController.animateCamera(
-                              CameraUpdate.newCameraPosition(
-                                CameraPosition(
-                                    target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
-                                    zoom: zoomValue,
-                                    tilt: 15.0,
-                                    bearing: 25),
-                              ),
-                            );
-                          }
-                          setState(() {});
-                        },
-                        child: Icon(Icons.adjust, color: followLocation ? Colors.black : Colors.white70),
-                      ),
-                      FloatingActionButton(
-                        onPressed: () async {
-                          await addMarker(initialCameraPosition);
-                        },
-                        child: Icon(
-                          Icons.not_listed_location,
-                          size: 30,
-                        ),
-                      )
                     ],
-                  )
-                  */
-                ],
-              ),
-            ),
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -533,6 +531,90 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
      */
 
+    // Добавление точки внутри области
+    /*
+    circles = Set.from([
+      Circle(
+          circleId: CircleId(markerIdGen(LatLng(location.latitude, location.longitude))),
+          center: LatLng(location.latitude, location.longitude),
+          fillColor: Colors.orangeAccent.withOpacity(0.2),
+          radius: 150,
+          strokeWidth: 1)
+    ]);
+    markers.add(Marker(
+      onDragEnd: (newPosition) {
+        print('newPosition: ${location.latitude} : ${location.longitude} | ${newPosition.latitude} : ${newPosition.longitude}');
+        var sqr = (location.latitude - newPosition.latitude) * (location.latitude - newPosition.latitude) +
+            (location.longitude - newPosition.longitude) * (location.longitude - newPosition.longitude);
+        var x = (location.latitude - newPosition.latitude) / sqr;
+        var y = (location.longitude - newPosition.longitude) / sqr;
+        print('${sqr}, ${sqrt(sqr) / 150}');
+
+        if (sqrt(sqr) / 150 > 0.0000118) {
+          Fluttertoast.showToast(
+              msg: "Маркер должен находиться внутри радиуса",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 3,
+              backgroundColor: Colors.redAccent,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        print(LatLng((location.latitude + 0.0000118 * x), (location.longitude + 0.0000118 * y)));
+
+
+
+        // 0.0000035943208250804098,  0.0018958694113995324
+        // 0.000004622836121367384,   0.002150078166338932
+        // 0.000004689080907293477,   0.0021654285735838706
+        // 0.000004886119992491786,   0.002210456964632378
+
+        // 0.000005573479099843701,   0.000015738811334255063
+        // 0.0000025618080164812444,  0.000010670432702839799
+        // 0.0000031492852818927464,  0.000011830817163272736
+        // 0.0000018822967510107873,  0.000009146454689017882
+      },
+      draggable: true,
+      icon: customMarkers[pointType],
+      markerId: MarkerId(markerIdGen(LatLng(location.latitude, location.longitude))),
+      position: LatLng(location.latitude, location.longitude),
+      // visible: (dbMarker.confirmsFor > 0) && (filtersList[markerTypesList.indexOf(dbMarker.markerType)]),
+      infoWindow: InfoWindow(title: EnumMethods.getDescription(pointType), snippet: 'Подтвердили: ${1}'),
+      onTap: () async {
+        return;
+        /*
+            if (followLocation) {
+              isAutoCameraMove = true;
+              widget.googleMapController.animateCamera(
+                CameraUpdate.newCameraPosition(
+                  CameraPosition(
+                      target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
+                ),
+              );
+            }
+            setState(() {
+              if (!ifChangeMarkerInfo) {
+                changeMarkerInfo = dbMarker;
+                ifChangeMarkerInfo = true;
+              } else {
+                if (ifChangeMarkerInfo && (changeMarkerInfo == dbMarker)) {
+                  ifChangeMarkerInfo = false;
+                  widget.googleMapController.hideMarkerInfoWindow(dbMarker.getMarkerId());
+                } else {
+                  changeMarkerInfo = dbMarker;
+                }
+              }
+            });
+            */
+      },
+      // consumeTapEvents: true,
+    ));
+
+    setState(() {});
+    return;
+
+    */
+
     var markerType = pointType;
     if (markerType == MarkerType.noType) {
       return;
@@ -631,3 +713,11 @@ class _MainMapState extends State<MainMap> with MapHelper {
     return atan(x / y) * 360 / (2 * pi);
   }
 }
+//
+// 55,1426914 : 61,238128700000004 | 55,144006946991574 : 61,23859662562609
+// 0,001315546991574  0,000467925626086
+// 0,000001949618278587377110676872
+//
+// 55,1426914 : 61,238128700000004 | 55,14197941087293 : 61,23613201081753
+// (-0,00071198912707) (-0,001996689182474)
+// 0,000004493696208474591075545576

@@ -8,6 +8,7 @@ class MarkerPage extends StatelessWidget {
   final MarkerInfo markerInfo;
   Map userDecisions;
   final String imagePath;
+  double imagesBorderRadius = 25.0;
 
   MarkerPage({Key key, @required this.markerInfo, @required this.userDecisions, @required this.imagePath}) : super(key: key);
 
@@ -23,7 +24,7 @@ class MarkerPage extends StatelessWidget {
               collapsedHeight: MediaQuery.of(context).size.width / 5,
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
-                  color: Colors.purpleAccent,
+                  color: Colors.blueAccent,
                 ),
                 title: Row(
                   children: [
@@ -56,7 +57,7 @@ class MarkerPage extends StatelessWidget {
                     Container(
                         width: MediaQuery.of(context).size.width,
                         child: Text(
-                          'Прикреплённые фото :',
+                          'Прикреплённые фото:',
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 28),
                         )),
@@ -71,36 +72,36 @@ class MarkerPage extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
-                              width: 300,
-                              color: Colors.yellow,
+                              decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(imagesBorderRadius)), color: Colors.yellow,),
+                              width: MediaQuery.of(context).size.width / 2,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
-                              width: 300,
-                              color: Colors.yellow,
+                              decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(imagesBorderRadius)), color: Colors.yellow,),
+                              width: MediaQuery.of(context).size.width / 2,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
-                              width: 300,
-                              color: Colors.yellow,
+                              decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(imagesBorderRadius)), color: Colors.yellow,),
+                              width: MediaQuery.of(context).size.width / 2,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
-                              width: 300,
-                              color: Colors.yellow,
+                              decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(imagesBorderRadius)), color: Colors.yellow,),
+                              width: MediaQuery.of(context).size.width / 2,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Container(
-                              width: 80,
-                              color: Colors.yellow,
+                              decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(imagesBorderRadius)), color: Colors.yellow,),
+                              width: MediaQuery.of(context).size.width / 2,
                             ),
                           ),
                         ],
@@ -120,7 +121,7 @@ class MarkerPage extends StatelessWidget {
                     Container(
                         width: MediaQuery.of(context).size.width,
                         child: Text(
-                          'Описание :',
+                          'Описание:',
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 28),
                         )),
@@ -129,13 +130,14 @@ class MarkerPage extends StatelessWidget {
                     ),
                     Container(
                         width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5.0)), border: Border.all(width: 2)),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5.0)), border: Border.all(width: 1, color: Colors.blueGrey)),
                         child: Padding(
                           padding: const EdgeInsets.all(6.0),
                           child: Text(
                             'На краю дороги стоял дуб. Он был, вероятно, в десять раз старше берез, составлявших лес, в десять раз толще и в два раза выше каждой березы. Это был огромный, в два обхвата дуб, с обломанными суками и корой, заросшей старыми болячками. С огромными, неуклюже, несимметрично растопыренными корявыми руками и пальцами, он старым, сердитым и презрительным уродом стоял между улыбающимися березами. Только он один не хотел подчиниться обаянию весны и не хотел видеть ни весны ни солнца.',
                             maxLines: 500,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 17),
                           ),
                         ))
                   ],
@@ -148,7 +150,6 @@ class MarkerPage extends StatelessWidget {
                   alignment: Alignment.bottomCenter,
                   child: MarkerScale(
                     markerInfo: markerInfo,
-                      userDecisions: userDecisions
                   )),
             ),
 
@@ -160,7 +161,7 @@ class MarkerPage extends StatelessWidget {
                     Container(
                         width: MediaQuery.of(context).size.width,
                         child: Text(
-                          'Комментарии :',
+                          'Комментарии:',
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 28),
                         )),
@@ -173,8 +174,8 @@ class MarkerPage extends StatelessWidget {
                           child: Row(
                             children: [
                               Container(
-                                alignment: Alignment.topCenter,
-                                width: 40,
+                                alignment: Alignment.topLeft,
+                                width: 50,
                                 height: 40,
                                 decoration: BoxDecoration(shape: BoxShape.circle),
                                 child: Image.asset(
@@ -182,9 +183,11 @@ class MarkerPage extends StatelessWidget {
                                   fit: BoxFit.contain,
                                 ),
                               ),
+
                               SizedBox(
                                 width: 10,
                               ),
+
                               Column(
                                 children: [
                                   Container(

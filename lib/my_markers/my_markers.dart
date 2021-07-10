@@ -27,7 +27,7 @@ class MyMarkers extends StatelessWidget with ThemeOne {
               expandedHeight: 100.0,
               flexibleSpace: FlexibleSpaceBar(
                 background: Container(
-                  color: Colors.purpleAccent,
+                  color: Colors.blueAccent,
                 ),
                 title: Container(
                   width: MediaQuery.of(context).size.width,
@@ -58,7 +58,7 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                       SizedBox(
                         width: 40,
                       ),
-                      Text('${markerPercentage[i]}  -  ', style: TextStyle(fontSize: 25),),
+                      Text('${markerPercentage[i]} % -  ', style: TextStyle(fontSize: 25),),
                       SizedBox(
                         width: 10,
                       ),
@@ -72,11 +72,11 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                       SizedBox(
                         width: 40,
                       ),
-                      IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () {
-                            print('deleted');
-                          }),
+                      // IconButton(
+                      //     icon: Icon(Icons.delete),
+                      //     onPressed: () {
+                      //       print('deleted');
+                      //     }),
                     ],
                   ),
                 ),

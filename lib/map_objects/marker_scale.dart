@@ -3,12 +3,13 @@ import 'package:attention_map/themes/theme_one.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../global/globals.dart' as globals;
 
 class MarkerScale extends StatefulWidget {
   MarkerInfo markerInfo;
-  Map<MarkerId, int> userDecisions;
+  // Map<MarkerId, int> userDecisions;
 
-  MarkerScale({Key key, @required this.markerInfo, this.userDecisions = const {}}) : super(key: key);
+  MarkerScale({Key key, @required this.markerInfo}) : super(key: key);
 
   @override
   _MarkerScaleState createState() => _MarkerScaleState();
@@ -24,6 +25,8 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
 
   @override
   void initState() {
+    confirmsFor = widget.markerInfo.confirmsFor;
+    confirmsAgainst = widget?.markerInfo?.confirmsAgainst ?? 0;
     super.initState();
   }
 
@@ -32,8 +35,8 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
     boxSize = 30.0;
     spaceBetween = 25.0;
     lineHeight = 12.0;
-    confirmsFor = widget.markerInfo.confirmsFor;
-    confirmsAgainst = widget?.markerInfo?.confirmsAgainst ?? 0;
+    // confirmsFor = widget.markerInfo.confirmsFor;
+    // confirmsAgainst = widget?.markerInfo?.confirmsAgainst ?? 0;
     lineLength = MediaQuery.of(context).size.width - boxSize * 5 - spaceBetween * 2 - 10.0;
     var forPercent = confirmsFor / (confirmsFor + confirmsAgainst);
     return Container(
@@ -48,9 +51,19 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 child: FloatingActionButton(
                   onPressed: () {
                     setState(() {
-                      confirmsFor++;
-                      widget.markerInfo.confirmsFor += 1;
-                      widget.userDecisions[widget.markerInfo.getMarkerId()] = 1;
+                      if (globals.userDecisions[widget.markerInfo.getMarkerId()] != 1) {
+                        if (globals.userDecisions[widget.markerInfo.getMarkerId()] == -1) {
+                          confirmsAgainst--;
+                          widget.markerInfo.confirmsAgainst--;
+                        }
+                        confirmsFor++;
+                        widget.markerInfo.confirmsFor += 1;
+                        globals.userDecisions[widget.markerInfo.getMarkerId()] = 1;
+
+                      }
+                      // confirmsFor++;
+                      // widget.markerInfo.confirmsFor += 1;
+                      // widget.userDecisions[widget.markerInfo.getMarkerId()] = 1;
                     });
                   },
                   backgroundColor: forColor,
@@ -65,7 +78,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 height: 5,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: (widget.userDecisions[widget.markerInfo.getMarkerId()] == 1) ? Colors.black : Colors.transparent,
+                  color: (globals.userDecisions[widget.markerInfo.getMarkerId()] == 1) ? Colors.black : Colors.transparent,
                 ),
               ),
             ],
@@ -128,9 +141,16 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 child: FloatingActionButton(
                   onPressed: () {
                     setState(() {
-                      confirmsAgainst++;
-                      widget.markerInfo.confirmsAgainst += 1;
-                      widget.userDecisions[widget.markerInfo.getMarkerId()] = -1;
+                      if (globals.userDecisions[widget.markerInfo.getMarkerId()] != -1) {
+                        if (globals.userDecisions[widget.markerInfo.getMarkerId()] == 1) {
+                          confirmsFor--;
+                          widget.markerInfo.confirmsFor --;
+                        }
+                        confirmsAgainst++;
+                        widget.markerInfo.confirmsAgainst += 1;
+                        globals.userDecisions[widget.markerInfo.getMarkerId()] = -1;
+
+                      }
                     });
                   },
                   backgroundColor: againstColor,
@@ -145,7 +165,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 height: 5,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.all(Radius.circular(10)),
-                  color: (widget.userDecisions[widget.markerInfo.getMarkerId()] == -1) ? Colors.black : Colors.transparent,
+                  color: (globals.userDecisions[widget.markerInfo.getMarkerId()] == -1) ? Colors.black : Colors.transparent,
                 ),
               ),
             ],
