@@ -19,7 +19,6 @@ import 'package:intl/intl.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'bottom_choose_list.dart';
-import 'full_map.dart';
 import 'map_helper.dart';
 import '../global/globals.dart' as globals;
 
@@ -623,6 +622,9 @@ class _MainMapState extends State<MainMap> with MapHelper {
     var latLon = location;
     var markerCoordinates = LatLng(latLon.latitude, latLon.longitude);
 
+    var mapMarkerId = MarkerId(markerIdGen(markerCoordinates));
+    globals.userDecisions[mapMarkerId] = 1;
+
     await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());
     await updateMarkers();
     setState(() {});
@@ -676,7 +678,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
   //создание ID метки
   String markerIdGen(LatLng coordinates) {
-    return coordinates.latitude.toString() + coordinates.longitude.toString();
+    return coordinates.latitude.toString() + '_' + coordinates.longitude.toString();
   }
 
   FloatingActionButton confirmMarkerFAB(MarkerInfo dbMarker) {

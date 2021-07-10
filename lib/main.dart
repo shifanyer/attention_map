@@ -9,6 +9,7 @@ import 'package:location/location.dart';
 
 import 'bottom_bar.dart';
 import 'enums/marker_type.dart';
+import 'local_db/write_in_file.dart';
 import 'map/main_map.dart';
 
 void main() {
@@ -45,12 +46,20 @@ class MyApp extends StatelessWidget {
                     if (pointsListSnapshot.hasData) {
                       return FutureBuilder(
                           future: loadMarkers(),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData)
-                              return BottomBar(
-                                markers: snapshot.data,
-                                markersList: pointsListSnapshot.data,
-                              );
+                          builder: (context, loadMarkersSnapshot) {
+                            if (loadMarkersSnapshot.hasData)
+                              return FutureBuilder(
+                                  future: FileOperations.readUserDecisions(),
+                                  builder: (context, userDecisionsSnapshot) {
+                                    if (userDecisionsSnapshot.hasData) {
+                                      return BottomBar(
+                                        markers: loadMarkersSnapshot.data,
+                                        markersList: pointsListSnapshot.data,
+                                      );
+                                    } else {
+                                      return Container();
+                                    }
+                                  });
                             else
                               return Container();
                           });

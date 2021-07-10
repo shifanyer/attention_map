@@ -12,7 +12,7 @@ class MarkerInfo {
   MarkerInfo({@required this.markerType, @required this.coordinates, @required this.confirmsFor, @required this.confirmsAgainst, @required this.lastTimeConfirmation});
 
   MarkerId getMarkerId() {
-    return MarkerId(this.coordinates.latitude.toString() + coordinates.longitude.toString());
+    return MarkerId(this.coordinates.latitude.toString() + '_' + coordinates.longitude.toString());
   }
 
   @override

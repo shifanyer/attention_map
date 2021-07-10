@@ -1,3 +1,4 @@
+import 'package:attention_map/local_db/write_in_file.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:attention_map/themes/theme_one.dart';
 import 'package:flutter/cupertino.dart';
@@ -59,7 +60,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                         confirmsFor++;
                         widget.markerInfo.confirmsFor += 1;
                         globals.userDecisions[widget.markerInfo.getMarkerId()] = 1;
-
+                        FileOperations.writeUserDecisions(globals.userDecisions);
                       }
                       // confirmsFor++;
                       // widget.markerInfo.confirmsFor += 1;
@@ -149,7 +150,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                         confirmsAgainst++;
                         widget.markerInfo.confirmsAgainst += 1;
                         globals.userDecisions[widget.markerInfo.getMarkerId()] = -1;
-
+                        FileOperations.writeUserDecisions(globals.userDecisions);
                       }
                     });
                   },
