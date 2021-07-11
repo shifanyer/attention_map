@@ -1,3 +1,4 @@
+import 'package:attention_map/db_methods/db_main_methods.dart';
 import 'package:attention_map/local_db/write_in_file.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:attention_map/themes/theme_one.dart';
@@ -52,15 +53,16 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 child: FloatingActionButton(
                   onPressed: () {
                     setState(() {
-                      //TODO Добавить запись в БД
                       if (globals.userDecisions[widget.markerInfo.getMarkerId()] != 1) {
                         if (globals.userDecisions[widget.markerInfo.getMarkerId()] == -1) {
                           confirmsAgainst--;
                           widget.markerInfo.confirmsAgainst--;
+                          DbMainMethods.plusConfirmsAgainst(widget.markerInfo, addValue: -1);
                         }
                         confirmsFor++;
                         widget.markerInfo.confirmsFor += 1;
                         globals.userDecisions[widget.markerInfo.getMarkerId()] = 1;
+                        DbMainMethods.plusConfirmsFor(widget.markerInfo, addValue: 1);
                         FileOperations.writeUserDecisions(globals.userDecisions);
                       }
                       // confirmsFor++;
@@ -143,15 +145,16 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                 child: FloatingActionButton(
                   onPressed: () {
                     setState(() {
-                      //TODO Добавить запись в БД
                       if (globals.userDecisions[widget.markerInfo.getMarkerId()] != -1) {
                         if (globals.userDecisions[widget.markerInfo.getMarkerId()] == 1) {
                           confirmsFor--;
                           widget.markerInfo.confirmsFor --;
+                          DbMainMethods.plusConfirmsFor(widget.markerInfo, addValue: -1);
                         }
                         confirmsAgainst++;
                         widget.markerInfo.confirmsAgainst += 1;
                         globals.userDecisions[widget.markerInfo.getMarkerId()] = -1;
+                        DbMainMethods.plusConfirmsAgainst(widget.markerInfo, addValue: 1);
                         FileOperations.writeUserDecisions(globals.userDecisions);
                       }
                     });

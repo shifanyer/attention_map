@@ -15,6 +15,37 @@ class MarkerInfo {
     return MarkerId(this.coordinates.latitude.toString() + '_' + coordinates.longitude.toString());
   }
 
+  Set<String> getCentersSet() {
+    LatLng currentLocation = coordinates;
+    var lat10 = (currentLocation.latitude * 10).ceil();
+    var lon10 = (currentLocation.longitude * 10).ceil();
+
+    var lat10div5 = (lat10 ~/ 5) * 5;
+    var lon10div5 = (lon10 ~/ 5) * 5;
+
+    var centersList = [
+      LatLng(lat10div5 / 10.0 - 0.5, lon10div5 / 10.0 - 0.5),
+      LatLng(lat10div5 / 10.0 - 0.5, lon10div5 / 10.0 - 0.0),
+      LatLng(lat10div5 / 10.0 - 0.5, lon10div5 / 10.0 + 0.5),
+      LatLng(lat10div5 / 10.0 - 0.0, lon10div5 / 10.0 - 0.5),
+      LatLng(lat10div5 / 10.0 - 0.0, lon10div5 / 10.0 - 0.0),
+      LatLng(lat10div5 / 10.0 - 0.0, lon10div5 / 10.0 + 0.5),
+      LatLng(lat10div5 / 10.0 + 0.5, lon10div5 / 10.0 - 0.5),
+      LatLng(lat10div5 / 10.0 + 0.5, lon10div5 / 10.0 - 0.0),
+      LatLng(lat10div5 / 10.0 + 0.5, lon10div5 / 10.0 + 0.5)
+    ];
+
+    var resSet = <String>{};
+
+    for (var center in centersList) {
+      if (((center.latitude - currentLocation.latitude).abs() <= 0.51) && ((center.longitude - currentLocation.longitude).abs() <= 0.51)) {
+        resSet.add(((center.latitude * 10).toString()).split('.').first + ((center.longitude * 10).toString()).split('.').first);
+      }
+    }
+
+    return resSet;
+  }
+
   @override
   String toString() {
     return 'markerType: ${markerType}, coordinates: ${coordinates}, for: ${confirmsFor}, against: ${confirmsAgainst}, lastTimeConfirmation: ${lastTimeConfirmation}';

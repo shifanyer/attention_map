@@ -10,7 +10,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'fire_storages/fire_storage_service.dart';
 
 class DbMainMethods {
-
   static Future<void> uploadPoint(LatLng pointCoordinates, MarkerType markerType, List<String> centers) async {
     var pointType = EnumMethods.enumToString(markerType);
     var markerId = (pointCoordinates.latitude * 1000).truncate().toString() + (pointCoordinates.longitude * 1000).truncate().toString();
@@ -23,8 +22,7 @@ class DbMainMethods {
         newItem.child('confirms').child('for').set(1);
         newItem.child('creation_time').set(DateTime.now().millisecondsSinceEpoch);
         newItem.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
-      }
-      else{
+      } else {
         newItem.child('confirms').child('for').set(itemObj?.value['confirms']['for'] + 1);
         newItem.child('last_confirm_time').set(DateTime.now().millisecondsSinceEpoch);
       }
@@ -39,8 +37,7 @@ class DbMainMethods {
       var itemObj = await newItem.once();
       if (itemObj?.value != null) {
         newItem.set(itemObj.value + 1);
-      }
-      else {
+      } else {
         newItem.set(1);
       }
     }
@@ -51,7 +48,7 @@ class DbMainMethods {
     for (var center in centers) {
       DatabaseReference camerasDatabaseReference = FirebaseDatabase.instance.reference().child(center);
       var radiusSnapshot = await camerasDatabaseReference.once();
-      if (radiusSnapshot?.value == null){
+      if (radiusSnapshot?.value == null) {
         return [];
       }
       for (var markerType in MarkerType.values) {
@@ -74,8 +71,35 @@ class DbMainMethods {
     return markers;
   }
 
-  static newConfirm() {
-
+  static plusConfirmsFor(MarkerInfo markerInfo, {int addValue = 1}) async {
+    Set<String> centers = markerInfo.getCentersSet();
+    var markerId = (markerInfo.coordinates.latitude * 1000).truncate().toString() + (markerInfo.coordinates.longitude * 1000).truncate().toString();
+    for (var center in centers) {
+      DatabaseReference itemConfirmsDatabaseReference = FirebaseDatabase.instance
+          .reference()
+          .child(center)
+          .child(EnumMethods.enumToString(markerInfo.markerType))
+          .child(markerId)
+          .child('confirms')
+          .child('for');
+      var confirms = await itemConfirmsDatabaseReference.once();
+      itemConfirmsDatabaseReference.set((confirms?.value ?? 0) + addValue);
+    }
   }
 
+  static plusConfirmsAgainst(MarkerInfo markerInfo, {int addValue = 1}) async {
+    Set<String> centers = markerInfo.getCentersSet();
+    var markerId = (markerInfo.coordinates.latitude * 1000).truncate().toString() + (markerInfo.coordinates.longitude * 1000).truncate().toString();
+    for (var center in centers) {
+      DatabaseReference itemConfirmsDatabaseReference = FirebaseDatabase.instance
+          .reference()
+          .child(center)
+          .child(EnumMethods.enumToString(markerInfo.markerType))
+          .child(markerId)
+          .child('confirms')
+          .child('against');
+      var confirms = await itemConfirmsDatabaseReference.once();
+      itemConfirmsDatabaseReference.set((confirms?.value ?? 0) + addValue);
+    }
+  }
 }
