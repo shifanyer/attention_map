@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MyMarkers extends StatelessWidget with ThemeOne {
-
   var cardHeight = 105.0;
   var edgeCornerRadius = 20.0;
 
@@ -21,7 +20,6 @@ class MyMarkers extends StatelessWidget with ThemeOne {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -113,14 +111,13 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                             height: cardHeight,
                             width: 20,
                             decoration: BoxDecoration(
-                              color: ThemeOne().forColor,
+                                color: (markerPercentage[i] >= 50) ? ThemeOne().forColor : ThemeOne().againstColor,
                                 borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(edgeCornerRadius),
-                                    topRight: Radius.circular(1.0),
-                                    bottomLeft: Radius.circular(edgeCornerRadius),
-                                    bottomRight: Radius.circular(1.0),
-                                )
-                            ),
+                                  topLeft: Radius.circular(edgeCornerRadius),
+                                  topRight: Radius.circular(1.0),
+                                  bottomLeft: Radius.circular(edgeCornerRadius),
+                                  bottomRight: Radius.circular(1.0),
+                                )),
                           ),
                           SizedBox(
                             width: 10,
@@ -130,10 +127,53 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                             height: 50,
                             child: Image.asset(markerImageAssets[i]),
                           ),
-                          Column(
-                            children: [
-
-                            ],
+                          Container(
+                            height: cardHeight,
+                            width: MediaQuery.of(context).size.width / 1.8,
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: (cardHeight - 2 * cardHeight / 2.5) / 2,
+                                ),
+                                Container(
+                                  height: cardHeight / 2.5,
+                                  width: MediaQuery.of(context).size.width / 3,
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Container(
+                                        width: cardHeight / 2.3,
+                                        height: cardHeight / 2.5,
+                                        child: Image.asset('assets/heart_like.png'),
+                                      ),
+                                      Text(
+                                        ' - ${markerPercentage[i].truncate()} %',
+                                        style: TextStyle(fontSize: 25),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  height: cardHeight / 2.4,
+                                  child: Center(
+                                    child: Text(
+                                      'Подтверждений: 24',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            width: cardHeight / 2.3,
+                            height: cardHeight / 2.5,
+                            child: Image.asset('assets/geo_icon_button.png'),
                           ),
                         ],
                       ),
@@ -191,7 +231,6 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                 ),
                 */
               ),
-
           ],
         ),
       ),
