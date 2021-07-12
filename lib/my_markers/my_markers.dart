@@ -3,6 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MyMarkers extends StatelessWidget with ThemeOne {
+
+  var cardHeight = 105.0;
+  var edgeCornerRadius = 20.0;
+
   static List<String> markerImageAssets = [
     'assets/camera_marker.png',
     'assets/monument_marker.png',
@@ -17,26 +21,126 @@ class MyMarkers extends StatelessWidget with ThemeOne {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        elevation: 5,
+        title: Center(
+          child: Text(
+            'Мои маркеры',
+            style: TextStyle(
+              color: Color(0xFF5C5C5C),
+              fontSize: 40,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+        ),
+        toolbarHeight: 150,
+        backgroundColor: Color(0xFFDEDEDE),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(10),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            /*
             SliverAppBar(
-              automaticallyImplyLeading: false,
-              pinned: true,
-              expandedHeight: 100.0,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Container(
-                  color: Colors.blueAccent,
-                ),
-                title: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Text('Мои маркеры'),
+              shadowColor: Colors.black,
+              elevation: 0.0,
+              // collapsedHeight: 100,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(10),
                 ),
               ),
+              automaticallyImplyLeading: false,
+              // backgroundColor: Color(0xFFDEDEDE),
+              backgroundColor: Colors.transparent,
+              pinned: true,
+              snap: false,
+              floating: false,
+              // expandedHeight: 100.0,
+
+              title: Text(
+                'Мои маркеры',
+                style: TextStyle(
+                  color: Color(0xFF5C5C5C),
+                  fontSize: 30,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+              /*
+              flexibleSpace: FlexibleSpaceBar(
+                centerTitle: true,
+                // background: Container(
+                //   color: Color(0xFFDEDEDE),
+                // ),
+                title: Text(
+                  'Мои маркеры',
+                  style: TextStyle(
+                    color: Color(0xFF5C5C5C),
+                    fontSize: 30,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ),
+
+               */
             ),
+
+             */
+
             for (var i = 0; i < markerImageAssets.length; i++)
               SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 4,
+                    height: cardHeight,
+                    child: Card(
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(edgeCornerRadius),
+                      ),
+                      color: Color(0xFFFCFCFC),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: cardHeight,
+                            width: 20,
+                            decoration: BoxDecoration(
+                              color: ThemeOne().forColor,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(edgeCornerRadius),
+                                    topRight: Radius.circular(1.0),
+                                    bottomLeft: Radius.circular(edgeCornerRadius),
+                                    bottomRight: Radius.circular(1.0),
+                                )
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            width: 50,
+                            height: 50,
+                            child: Image.asset(markerImageAssets[i]),
+                          ),
+                          Column(
+                            children: [
+
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                /*
                 child: Container(
                   decoration: BoxDecoration(border: Border(top: BorderSide(width: 1), bottom: BorderSide(width: 1))),
                   height: 100,
@@ -44,7 +148,9 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                   child: Row(
                     children: [
                       Container(
-                        decoration: BoxDecoration(border: Border(right: BorderSide(color: Colors.black, width: 1)), color: (markerPercentage[i] >= 50) ? forColor : againstColor),
+                        decoration: BoxDecoration(
+                            border: Border(right: BorderSide(color: Colors.black, width: 1)),
+                            color: (markerPercentage[i] >= 50) ? forColor : againstColor),
                         width: 10,
                       ),
                       SizedBox(
@@ -58,7 +164,10 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                       SizedBox(
                         width: 40,
                       ),
-                      Text('${markerPercentage[i]} % -  ', style: TextStyle(fontSize: 25),),
+                      Text(
+                        '${markerPercentage[i]} % -  ',
+                        style: TextStyle(fontSize: 25),
+                      ),
                       SizedBox(
                         width: 10,
                       ),
@@ -80,7 +189,9 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                     ],
                   ),
                 ),
+                */
               ),
+
           ],
         ),
       ),

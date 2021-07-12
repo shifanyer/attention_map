@@ -36,7 +36,6 @@ class FileOperations {
       final file = await _userDecisions;
       Map writtenFile = json.decode((file?.readAsStringSync()) ?? '');
       globals.userDecisions = writtenFile.map((key, value) => MapEntry(MarkerId(key), value)) ?? {};
-      print('globals.userDecisions: ${globals.userDecisions} writtenFile: ${writtenFile}');
       return true;
     } catch (e) {
       // If encountering an error, return 0
