@@ -9,7 +9,12 @@ class MarkerInfo {
   int confirmsAgainst;
   int lastTimeConfirmation;
 
-  MarkerInfo({@required this.markerType, @required this.coordinates, @required this.confirmsFor, @required this.confirmsAgainst, @required this.lastTimeConfirmation});
+  MarkerInfo(
+      {@required this.markerType,
+      @required this.coordinates,
+      @required this.confirmsFor,
+      @required this.confirmsAgainst,
+      @required this.lastTimeConfirmation});
 
   MarkerId getMarkerId() {
     return MarkerId(this.coordinates.latitude.toString() + '_' + coordinates.longitude.toString());
@@ -51,4 +56,19 @@ class MarkerInfo {
     return 'markerType: ${markerType}, coordinates: ${coordinates}, for: ${confirmsFor}, against: ${confirmsAgainst}, lastTimeConfirmation: ${lastTimeConfirmation}';
   }
 
+  MarkerInfo.fromJson(Map<String, dynamic> json)
+      : markerType = MarkerType.values.firstWhere((e) => e.toString() == json['markerType']),
+        coordinates = LatLng(json['coordX'], json['coordY']),
+        confirmsFor = json['confirmsFor'],
+        confirmsAgainst = json['confirmsAgainst'],
+        lastTimeConfirmation = json['lastTimeConfirmation'];
+
+  Map<String, dynamic> toJson() => {
+        'markerType': markerType.toString(),
+        'coordX': coordinates.latitude,
+        'coordY': coordinates.longitude,
+        'confirmsFor': confirmsFor,
+        'confirmsAgainst': confirmsAgainst,
+        'lastTimeConfirmation': lastTimeConfirmation,
+      };
 }

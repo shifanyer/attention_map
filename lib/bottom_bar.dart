@@ -23,8 +23,6 @@ class _BottomBarState extends State<BottomBar> {
   int _selectedIndex = 1;
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  GoogleMapController googleMapController;
-
   // static const List<Widget> _widgetOptions = <Widget>[
   //   Text(
   //     'Index 0: Home',
@@ -50,7 +48,6 @@ class _BottomBarState extends State<BottomBar> {
         startCameraPosition: startCameraPosition,
         customMarkers: widget.markers,
         markersList: widget.markersList,
-        googleMapController: googleMapController,
       ),
       Text(
         'Index 2: School',

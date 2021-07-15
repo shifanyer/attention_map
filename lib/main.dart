@@ -52,9 +52,19 @@ class MyApp extends StatelessWidget {
                                   future: FileOperations.readUserDecisions(),
                                   builder: (context, userDecisionsSnapshot) {
                                     if (userDecisionsSnapshot.hasData) {
-                                      return BottomBar(
-                                        markers: loadMarkersSnapshot.data,
-                                        markersList: pointsListSnapshot.data,
+                                      return FutureBuilder(
+                                        future: FileOperations.readUserMarkers(),
+                                        builder: (context, userMarkersSnapshot) {
+                                          if (userMarkersSnapshot.hasData) {
+                                              return BottomBar(
+                                                markers: loadMarkersSnapshot.data,
+                                                markersList: pointsListSnapshot.data,
+                                              );
+                                            }
+                                          else{
+                                            return Container();
+                                          }
+                                          }
                                       );
                                     } else {
                                       return Container();

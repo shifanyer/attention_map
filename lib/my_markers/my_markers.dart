@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MyMarkers extends StatelessWidget with ThemeOne {
-  var cardHeight = 105.0;
+  var cardHeight = 95.0;
   var edgeCornerRadius = 20.0;
 
   static List<String> markerImageAssets = [
@@ -20,8 +20,10 @@ class MyMarkers extends StatelessWidget with ThemeOne {
 
   @override
   Widget build(BuildContext context) {
+    cardHeight = 95.0;
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
         elevation: 5,
         title: Center(
@@ -42,27 +44,29 @@ class MyMarkers extends StatelessWidget with ThemeOne {
           ),
         ),
       ),
+
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
             /*
             SliverAppBar(
               shadowColor: Colors.black,
-              elevation: 0.0,
-              // collapsedHeight: 100,
+              elevation: 6.0,
+              collapsedHeight: 100,
+              expandedHeight: 200,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(
                   bottom: Radius.circular(10),
                 ),
               ),
-              automaticallyImplyLeading: false,
-              // backgroundColor: Color(0xFFDEDEDE),
-              backgroundColor: Colors.transparent,
+              automaticallyImplyLeading: true,
+              backgroundColor: Color(0xFFDEDEDE),
+              // backgroundColor: Colors.transparent,
               pinned: true,
               snap: false,
-              floating: false,
+              floating: true,
               // expandedHeight: 100.0,
-
+/*
               title: Text(
                 'Мои маркеры',
                 style: TextStyle(
@@ -71,26 +75,35 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                   fontWeight: FontWeight.w300,
                 ),
               ),
-              /*
+*/
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
-                // background: Container(
-                //   color: Color(0xFFDEDEDE),
-                // ),
-                title: Text(
-                  'Мои маркеры',
-                  style: TextStyle(
-                    color: Color(0xFF5C5C5C),
-                    fontSize: 30,
-                    fontWeight: FontWeight.w300,
+                stretchModes: [StretchMode.fadeTitle],
+                background: Container(
+                  decoration: BoxDecoration(
+                      color: Color(0xFFDEDEDE),
+                      boxShadow: [BoxShadow(blurRadius: 3)],
+                      borderRadius: new BorderRadius.only(
+                        bottomRight: Radius.circular(10.0),
+                        bottomLeft: Radius.circular(10.0),
+                      )
+                  ),
+                ),
+                title: Center(
+                  child: Text(
+                    'Мои маркеры',
+                    style: TextStyle(
+                      color: Color(0xFF5C5C5C),
+                      fontSize: 30,
+                      fontWeight: FontWeight.w300,
+                    ),
                   ),
                 ),
               ),
 
-               */
-            ),
 
-             */
+            ),
+            */
 
             for (var i = 0; i < markerImageAssets.length; i++)
               SliverToBoxAdapter(
@@ -156,7 +169,7 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                                   ),
                                 ),
                                 Container(
-                                  height: cardHeight / 2.4,
+                                  height: cardHeight / 2.5,
                                   child: Center(
                                     child: Text(
                                       'Подтверждений: 24',
@@ -170,10 +183,13 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                           SizedBox(
                             width: 10,
                           ),
-                          Container(
-                            width: cardHeight / 2.3,
-                            height: cardHeight / 2.5,
-                            child: Image.asset('assets/geo_icon_button.png'),
+                          GestureDetector(
+                            onTap: openMap(),
+                            child: Container(
+                              width: cardHeight / 2.3,
+                              height: cardHeight / 2.5,
+                              child: Image.asset('assets/geo_icon_button.png'),
+                            ),
                           ),
                         ],
                       ),
@@ -236,4 +252,8 @@ class MyMarkers extends StatelessWidget with ThemeOne {
       ),
     );
   }
+}
+
+openMap() {
+  //TODO функция, которая открывает карту с переданной меткой.
 }

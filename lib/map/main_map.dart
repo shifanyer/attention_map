@@ -26,9 +26,8 @@ class MainMap extends StatefulWidget {
   LatLng startCameraPosition;
   final List<MarkerInfo> markersList;
   final Map<MarkerType, BitmapDescriptor> customMarkers;
-  GoogleMapController googleMapController;
 
-  MainMap({Key key, this.startCameraPosition, @required this.markersList, @required this.customMarkers, @required this.googleMapController})
+  MainMap({Key key, this.startCameraPosition, @required this.markersList, @required this.customMarkers})
       : super(key: key);
 
   @override
@@ -117,10 +116,10 @@ class _MainMapState extends State<MainMap> with MapHelper {
   }
 
   void _onMapCreated(GoogleMapController _cntlr) {
-    widget.googleMapController = _cntlr;
+    globals.googleMapController = _cntlr;
     if (followLocation) {
       isAutoCameraMove = true;
-      widget.googleMapController.animateCamera(
+      globals.googleMapController.animateCamera(
         CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
         ),
@@ -234,7 +233,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
                                   followLocation = !followLocation;
                                   if (followLocation) {
                                     isAutoCameraMove = true;
-                                    widget.googleMapController.animateCamera(
+                                    globals.googleMapController.animateCamera(
                                       CameraUpdate.newCameraPosition(
                                         CameraPosition(
                                             target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude),
@@ -394,13 +393,13 @@ class _MainMapState extends State<MainMap> with MapHelper {
       }
 
       // Zoom при перемещении обратно к геопозиции не меняется, если отдалиться или приблизиться
-      if (widget.googleMapController != null) {
-        zoomValue = await widget.googleMapController.getZoomLevel();
+      if (globals.googleMapController != null) {
+        zoomValue = await globals.googleMapController.getZoomLevel();
       }
       if (followLocation) {
         var bearing = calculateBearing(prevDot, LatLng(_currentPosition.latitude, _currentPosition.longitude));
         isAutoCameraMove = true;
-        widget.googleMapController.animateCamera(
+        globals.googleMapController.animateCamera(
           CameraUpdate.newCameraPosition(
             CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
           ),
@@ -476,7 +475,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
           if (followLocation) {
             isAutoCameraMove = true;
-            widget.googleMapController.animateCamera(
+            globals.googleMapController.animateCamera(
               CameraUpdate.newCameraPosition(
                 CameraPosition(
                     target: LatLng(initialCameraPosition.latitude, initialCameraPosition.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
@@ -490,7 +489,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
             } else {
               if (ifChangeMarkerInfo && (changeMarkerInfo == dbMarker)) {
                 ifChangeMarkerInfo = false;
-                widget.googleMapController.hideMarkerInfoWindow(dbMarker.getMarkerId());
+                globals.googleMapController.hideMarkerInfoWindow(dbMarker.getMarkerId());
               } else {
                 changeMarkerInfo = dbMarker;
               }
@@ -644,11 +643,11 @@ class _MainMapState extends State<MainMap> with MapHelper {
         backgroundColor: Colors.green,
         textColor: Colors.white,
         fontSize: 16.0);
-    widget.googleMapController.hideMarkerInfoWindow(markerInfo.getMarkerId());
+    globals.googleMapController.hideMarkerInfoWindow(markerInfo.getMarkerId());
     setState(() {
       ifChangeMarkerInfo = false;
     });
-    await DbMainMethods.uploadPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
+    await DbMainMethods.uploadPoint(markerCoordinates, markerInfo.markerType, markerInfo.getCentersSet().toList());
     await updateMarkers();
     // setState(() {});
   }
@@ -670,7 +669,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
     setState(() {
       ifChangeMarkerInfo = false;
     });
-    widget.googleMapController.hideMarkerInfoWindow(markerInfo.getMarkerId());
+    globals.googleMapController.hideMarkerInfoWindow(markerInfo.getMarkerId());
     await DbMainMethods.subtractPoint(markerCoordinates, markerInfo.markerType, centersSet.toList());
     await updateMarkers();
     // setState(() {});
