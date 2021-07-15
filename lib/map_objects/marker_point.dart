@@ -20,6 +20,14 @@ class MarkerInfo {
     return MarkerId(this.coordinates.latitude.toString() + '_' + coordinates.longitude.toString());
   }
 
+  double getPercentage() {
+    return ((confirmsFor ?? 0) / ((confirmsFor ?? 0) + (confirmsAgainst ?? 0))) * 100;
+  }
+
+  int getHumanReadablePercentage() {
+    return (getPercentage()).truncate();
+  }
+
   Set<String> getCentersSet() {
     LatLng currentLocation = coordinates;
     var lat10 = (currentLocation.latitude * 10).ceil();

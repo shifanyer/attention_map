@@ -68,11 +68,11 @@ class _MainMapState extends State<MainMap> with MapHelper {
   static List<String> markerImageAssets = [
     'assets/camera_marker.png',
     'assets/monument_marker.png',
-    'assets/DPS_marker.png',
+    'assets/dps_marker.png',
     'assets/danger_marker.png',
     'assets/dtp_marker.png',
     'assets/help_marker.png',
-    'assets/destination_map_marker.png'
+    'assets/other_marker.png'
   ];
 
   // Marker marker;

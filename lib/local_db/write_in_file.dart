@@ -54,8 +54,8 @@ class FileOperations {
   static Future<void> writeUserMarkers(Map<String, MarkerInfo> userMarkers) async {
     final file = await _userMarkers;
     file.writeAsStringSync(jsonEncode(userMarkers.map((key, value) => MapEntry(key, value.toJson()))));
-    var writtenFile = json.decode((file?.readAsStringSync()) ?? '');
-    print('writtenFile: ${writtenFile}');
+    // var writtenFile = json.decode((file?.readAsStringSync()) ?? '');
+    // print('writtenFile: ${writtenFile}');
   }
 
 

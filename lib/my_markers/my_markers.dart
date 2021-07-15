@@ -1,6 +1,9 @@
+import 'package:attention_map/enums/enumMethods.dart';
+import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/themes/theme_one.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../global/globals.dart' as globals;
 
 class MyMarkers extends StatelessWidget with ThemeOne {
   var cardHeight = 95.0;
@@ -9,18 +12,20 @@ class MyMarkers extends StatelessWidget with ThemeOne {
   static List<String> markerImageAssets = [
     'assets/camera_marker.png',
     'assets/monument_marker.png',
-    'assets/DPS_marker.png',
+    'assets/dps_marker.png',
     'assets/danger_marker.png',
     'assets/dtp_marker.png',
     'assets/help_marker.png',
-    'assets/destination_map_marker.png'
+    'assets/other_marker.png',
   ];
 
   static List<double> markerPercentage = [30.01, 51.32, 25.55, 100.0, 95.83, 33.33, 66.67];
 
   @override
   Widget build(BuildContext context) {
-    cardHeight = 95.0;
+    cardHeight = 105.0;
+    // print('assets/${EnumMethods.enumToString(globals.userMarkers.values.first.markerType)}_maker.png');
+    // print('assets/monument_marker.png');
     return Scaffold(
       backgroundColor: Colors.white,
 
@@ -31,7 +36,7 @@ class MyMarkers extends StatelessWidget with ThemeOne {
             'Мои маркеры',
             style: TextStyle(
               color: Color(0xFF5C5C5C),
-              fontSize: 40,
+              fontSize: 45,
               fontWeight: FontWeight.w300,
             ),
           ),
@@ -105,7 +110,11 @@ class MyMarkers extends StatelessWidget with ThemeOne {
             ),
             */
 
-            for (var i = 0; i < markerImageAssets.length; i++)
+            // for (var i = 0; i < globals.userMarkers.length; i++)
+            SliverToBoxAdapter(
+              child: SizedBox(height: 10,),
+            ),
+            for (var markerInfo in globals.userMarkers.values)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
@@ -124,7 +133,7 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                             height: cardHeight,
                             width: 20,
                             decoration: BoxDecoration(
-                                color: (markerPercentage[i] >= 50) ? ThemeOne().forColor : ThemeOne().againstColor,
+                                color: (markerInfo.getPercentage() >= 50) ? ThemeOne().more50 : ThemeOne().less50,
                                 borderRadius: BorderRadius.only(
                                   topLeft: Radius.circular(edgeCornerRadius),
                                   topRight: Radius.circular(1.0),
@@ -138,7 +147,8 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                           Container(
                             width: 50,
                             height: 50,
-                            child: Image.asset(markerImageAssets[i]),
+                            child: Image.asset('assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png'),
+                            // child: Image.asset('assets/dps_marker.png'),
                           ),
                           Container(
                             height: cardHeight,
@@ -150,21 +160,25 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                                 ),
                                 Container(
                                   height: cardHeight / 2.5,
-                                  width: MediaQuery.of(context).size.width / 3,
+                                  width: MediaQuery.of(context).size.width / 2.4,
                                   child: Row(
                                     children: [
                                       SizedBox(
                                         width: 10,
                                       ),
                                       Container(
-                                        width: cardHeight / 2.3,
+                                        width: cardHeight / 2.5,
                                         height: cardHeight / 2.5,
                                         child: Image.asset('assets/heart_like.png'),
                                       ),
-                                      Text(
-                                        ' - ${markerPercentage[i].truncate()} %',
-                                        style: TextStyle(fontSize: 25),
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 5),
+                                        child: Text(
+                                          '- ${markerInfo.getHumanReadablePercentage()} %',
+                                          style: TextStyle(fontSize: 40),
+                                        ),
                                       ),
+
                                     ],
                                   ),
                                 ),
@@ -172,7 +186,7 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                                   height: cardHeight / 2.5,
                                   child: Center(
                                     child: Text(
-                                      'Подтверждений: 24',
+                                      'Подтверждений: ${markerInfo.confirmsFor}',
                                       style: TextStyle(fontSize: 20),
                                     ),
                                   ),
