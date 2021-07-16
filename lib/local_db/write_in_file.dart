@@ -28,11 +28,11 @@ class FileOperations {
     return File('$path/counter.txt');
   }
 
-  static Future<void> writeUserDecisions(Map<MarkerId, int> userDecisions) async {
+  static Future<void> writeUserDecisions() async {
     final file = await _userDecisions;
 
     // Write the file
-    var stringDecisions = userDecisions.map((MarkerId key, value) => MapEntry(key.value, value));
+    var stringDecisions = globals.userDecisions.map((MarkerId key, value) => MapEntry(key.value, value));
     file.writeAsStringSync(jsonEncode(stringDecisions));
     // print(writtenFile);
   }
@@ -51,9 +51,9 @@ class FileOperations {
     }
   }
 
-  static Future<void> writeUserMarkers(Map<String, MarkerInfo> userMarkers) async {
+  static Future<void> writeUserMarkers() async {
     final file = await _userMarkers;
-    file.writeAsStringSync(jsonEncode(userMarkers.map((key, value) => MapEntry(key, value.toJson()))));
+    file.writeAsStringSync(jsonEncode(globals.userMarkers.map((key, value) => MapEntry(key, value.toJson()))));
     // var writtenFile = json.decode((file?.readAsStringSync()) ?? '');
     // print('writtenFile: ${writtenFile}');
   }

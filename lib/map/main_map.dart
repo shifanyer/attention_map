@@ -5,6 +5,7 @@ import 'package:attention_map/db_methods/db_main_methods.dart';
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/filters/marker_filters.dart';
+import 'package:attention_map/local_db/write_in_file.dart';
 import 'package:attention_map/map_objects/marker_page.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:attention_map/map_objects/marker_scale.dart';
@@ -469,7 +470,6 @@ class _MainMapState extends State<MainMap> with MapHelper {
               CupertinoPageRoute(
                   builder: (context) => MarkerPage(
                       markerInfo: dbMarker,
-                      userDecisions: userDecisions,
                       imagePath: markerImageAssets[markerTypesList.indexOf(dbMarker.markerType)])));
           return;
 
@@ -623,7 +623,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
     var mapMarkerId = MarkerId(markerIdGen(markerCoordinates));
     globals.userDecisions[mapMarkerId] = 1;
-
+    FileOperations.writeUserDecisions();
     await DbMainMethods.uploadPoint(markerCoordinates, markerType, centersSet.toList());
     await updateMarkers();
     setState(() {});

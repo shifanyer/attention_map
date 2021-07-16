@@ -29,7 +29,7 @@ class DbMainMethods {
               confirmsAgainst: 0,
               lastTimeConfirmation: nowTime);
           globals.userMarkers[newMarker.getMarkerId().value] = newMarker;
-          FileOperations.writeUserMarkers(globals.userMarkers);
+          FileOperations.writeUserMarkers();
         }
         newItem.child('coordX').set(pointCoordinates.latitude);
         newItem.child('coordY').set(pointCoordinates.longitude);

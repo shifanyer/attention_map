@@ -7,3 +7,5 @@ Map<MarkerId, int> userDecisions;
 double bottomHeight = 70.0;
 GoogleMapController googleMapController;
 Map<String, MarkerInfo> userMarkers;
+bool isDarkTheme = false;
+bool isNotificationsOn = true;

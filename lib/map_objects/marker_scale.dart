@@ -63,7 +63,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                         widget.markerInfo.confirmsFor += 1;
                         globals.userDecisions[widget.markerInfo.getMarkerId()] = 1;
                         DbMainMethods.plusConfirmsFor(widget.markerInfo, addValue: 1);
-                        FileOperations.writeUserDecisions(globals.userDecisions);
+                        FileOperations.writeUserDecisions();
                       }
                       // confirmsFor++;
                       // widget.markerInfo.confirmsFor += 1;
@@ -155,7 +155,7 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                         widget.markerInfo.confirmsAgainst += 1;
                         globals.userDecisions[widget.markerInfo.getMarkerId()] = -1;
                         DbMainMethods.plusConfirmsAgainst(widget.markerInfo, addValue: 1);
-                        FileOperations.writeUserDecisions(globals.userDecisions);
+                        FileOperations.writeUserDecisions();
                       }
                     });
                   },

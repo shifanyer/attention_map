@@ -1,14 +1,14 @@
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
+import 'package:attention_map/local_db/write_in_file.dart';
+import 'package:attention_map/map_objects/marker_page.dart';
 import 'package:attention_map/themes/theme_one.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import '../global/globals.dart' as globals;
 
-class MyMarkers extends StatelessWidget with ThemeOne {
-  var cardHeight = 95.0;
-  var edgeCornerRadius = 20.0;
-
+class MyMarkers extends StatefulWidget with ThemeOne {
   static List<String> markerImageAssets = [
     'assets/camera_marker.png',
     'assets/monument_marker.png',
@@ -22,13 +22,21 @@ class MyMarkers extends StatelessWidget with ThemeOne {
   static List<double> markerPercentage = [30.01, 51.32, 25.55, 100.0, 95.83, 33.33, 66.67];
 
   @override
+  _MyMarkersState createState() => _MyMarkersState();
+}
+
+class _MyMarkersState extends State<MyMarkers> {
+  var cardHeight = 95.0;
+
+  var edgeCornerRadius = 20.0;
+
+  @override
   Widget build(BuildContext context) {
     cardHeight = 105.0;
     // print('assets/${EnumMethods.enumToString(globals.userMarkers.values.first.markerType)}_maker.png');
     // print('assets/monument_marker.png');
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         elevation: 5,
         title: Center(
@@ -49,7 +57,6 @@ class MyMarkers extends StatelessWidget with ThemeOne {
           ),
         ),
       ),
-
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
@@ -112,7 +119,9 @@ class MyMarkers extends StatelessWidget with ThemeOne {
 
             // for (var i = 0; i < globals.userMarkers.length; i++)
             SliverToBoxAdapter(
-              child: SizedBox(height: 10,),
+              child: SizedBox(
+                height: 10,
+              ),
             ),
             for (var markerInfo in globals.userMarkers.values)
               SliverToBoxAdapter(
@@ -121,91 +130,111 @@ class MyMarkers extends StatelessWidget with ThemeOne {
                   child: Container(
                     width: MediaQuery.of(context).size.width - 4,
                     height: cardHeight,
-                    child: Card(
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(edgeCornerRadius),
-                      ),
-                      color: Color(0xFFFCFCFC),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: cardHeight,
-                            width: 20,
-                            decoration: BoxDecoration(
-                                color: (markerInfo.getPercentage() >= 50) ? ThemeOne().more50 : ThemeOne().less50,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(edgeCornerRadius),
-                                  topRight: Radius.circular(1.0),
-                                  bottomLeft: Radius.circular(edgeCornerRadius),
-                                  bottomRight: Radius.circular(1.0),
-                                )),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => MarkerPage(
+                                    markerInfo: markerInfo, imagePath: 'assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png')));
+                      },
+                      child: Dismissible(
+                        key: Key(markerInfo.getMarkerId().value),
+                        background: redDeleteDismiss(false),
+                        secondaryBackground: redDeleteDismiss(true),
+                        onDismissed: (_) {
+                          setState(() {
+                            globals.userMarkers.remove(markerInfo.getMarkerId().value);
+                            FileOperations.writeUserMarkers();
+                            //TODO добавить удаление из БД
+                          });
+                        },
+                        child: Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(edgeCornerRadius),
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            width: 50,
-                            height: 50,
-                            child: Image.asset('assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png'),
-                            // child: Image.asset('assets/dps_marker.png'),
-                          ),
-                          Container(
-                            height: cardHeight,
-                            width: MediaQuery.of(context).size.width / 1.8,
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: (cardHeight - 2 * cardHeight / 2.5) / 2,
-                                ),
-                                Container(
-                                  height: cardHeight / 2.5,
-                                  width: MediaQuery.of(context).size.width / 2.4,
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 10,
+                          color: Color(0xFFFCFCFC),
+                          child: Row(
+                            children: [
+                              Container(
+                                height: cardHeight,
+                                width: 20,
+                                decoration: BoxDecoration(
+                                    color: (markerInfo.getPercentage() >= 50) ? ThemeOne().more50 : ThemeOne().less50,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(edgeCornerRadius),
+                                      topRight: Radius.circular(1.0),
+                                      bottomLeft: Radius.circular(edgeCornerRadius),
+                                      bottomRight: Radius.circular(1.0),
+                                    )),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                width: 50,
+                                height: 50,
+                                child: Image.asset('assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png'),
+                                // child: Image.asset('assets/dps_marker.png'),
+                              ),
+                              Container(
+                                height: cardHeight,
+                                width: MediaQuery.of(context).size.width / 1.8,
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height: (cardHeight - 2 * cardHeight / 2.5) / 2,
+                                    ),
+                                    Container(
+                                      height: cardHeight / 2.5,
+                                      width: MediaQuery.of(context).size.width / 2.4,
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          Container(
+                                            width: cardHeight / 2.5,
+                                            height: cardHeight / 2.5,
+                                            child: Image.asset('assets/heart_like.png'),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: 5),
+                                            child: Text(
+                                              '- ${markerInfo.getHumanReadablePercentage()} %',
+                                              style: TextStyle(fontSize: 40),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Container(
-                                        width: cardHeight / 2.5,
-                                        height: cardHeight / 2.5,
-                                        child: Image.asset('assets/heart_like.png'),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(bottom: 5),
+                                    ),
+                                    Container(
+                                      height: cardHeight / 2.5,
+                                      child: Center(
                                         child: Text(
-                                          '- ${markerInfo.getHumanReadablePercentage()} %',
-                                          style: TextStyle(fontSize: 40),
+                                          'Подтверждений: ${markerInfo.confirmsFor}',
+                                          style: TextStyle(fontSize: 20),
                                         ),
                                       ),
-
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  height: cardHeight / 2.5,
-                                  child: Center(
-                                    child: Text(
-                                      'Подтверждений: ${markerInfo.confirmsFor}',
-                                      style: TextStyle(fontSize: 20),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              GestureDetector(
+                                onTap: openMap(),
+                                child: Container(
+                                  width: cardHeight / 2.3,
+                                  height: cardHeight / 2.5,
+                                  child: Image.asset('assets/geo_icon_button.png'),
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          GestureDetector(
-                            onTap: openMap(),
-                            child: Container(
-                              width: cardHeight / 2.3,
-                              height: cardHeight / 2.5,
-                              child: Image.asset('assets/geo_icon_button.png'),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -264,6 +293,18 @@ class MyMarkers extends StatelessWidget with ThemeOne {
           ],
         ),
       ),
+    );
+  }
+
+  Container redDeleteDismiss(bool isRight) {
+    return Container(
+      color: Colors.red,
+      child: Align(
+          alignment: isRight ? Alignment.centerRight : Alignment.centerLeft,
+          child: Padding(
+            padding: isRight ? const EdgeInsets.only(right: 15.0) : const EdgeInsets.only(left: 15.0),
+            child: Icon(Icons.delete),
+          )),
     );
   }
 }

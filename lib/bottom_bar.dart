@@ -6,6 +6,7 @@ import 'map/main_map.dart';
 import 'map_objects/marker_point.dart';
 import 'my_markers/my_markers.dart';
 import 'global/globals.dart' as globals;
+import 'settings/settings.dart';
 
 /// This is the stateful widget that the main application instantiates.
 class BottomBar extends StatefulWidget {
@@ -49,10 +50,11 @@ class _BottomBarState extends State<BottomBar> {
         customMarkers: widget.markers,
         markersList: widget.markersList,
       ),
-      Text(
-        'Index 2: School',
-        style: optionStyle,
-      ),
+      SettingsPage(),
+      // Text(
+      //   'Index 2: School',
+      //   style: optionStyle,
+      // ),
     ];
     // startCameraPosition = ;
     super.initState();
