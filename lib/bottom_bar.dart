@@ -62,6 +62,13 @@ class _BottomBarState extends State<BottomBar> {
 
   void _onItemTapped(int index) {
     setState(() {
+      if (index == 1) {
+        globals.isMapOpened = true;
+      }
+      else {
+        globals.googleMapController = null;
+        globals.isMapOpened = false;
+      }
       _selectedIndex = index;
     });
   }

@@ -26,15 +26,12 @@ class MyMarkers extends StatefulWidget with ThemeOne {
 }
 
 class _MyMarkersState extends State<MyMarkers> {
-  var cardHeight = 95.0;
+  var cardHeight = 105.0;
 
   var edgeCornerRadius = 20.0;
 
   @override
   Widget build(BuildContext context) {
-    cardHeight = 105.0;
-    // print('assets/${EnumMethods.enumToString(globals.userMarkers.values.first.markerType)}_maker.png');
-    // print('assets/monument_marker.png');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -130,24 +127,25 @@ class _MyMarkersState extends State<MyMarkers> {
                   child: Container(
                     width: MediaQuery.of(context).size.width - 4,
                     height: cardHeight,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) => MarkerPage(
-                                    markerInfo: markerInfo, imagePath: 'assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png')));
+                    child: Dismissible(
+                      key: Key(markerInfo.getMarkerId().value),
+                      background: redDeleteDismiss(false),
+                      secondaryBackground: redDeleteDismiss(true),
+                      onDismissed: (_) {
+                        setState(() {
+                          globals.userMarkers.remove(markerInfo.getMarkerId().value);
+                          FileOperations.writeUserMarkers();
+                          //TODO добавить удаление из БД
+                        });
                       },
-                      child: Dismissible(
-                        key: Key(markerInfo.getMarkerId().value),
-                        background: redDeleteDismiss(false),
-                        secondaryBackground: redDeleteDismiss(true),
-                        onDismissed: (_) {
-                          setState(() {
-                            globals.userMarkers.remove(markerInfo.getMarkerId().value);
-                            FileOperations.writeUserMarkers();
-                            //TODO добавить удаление из БД
-                          });
+                      child: GestureDetector(
+                        onTap: () async {
+                          await Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                  builder: (context) => MarkerPage(
+                                      markerInfo: markerInfo, imagePath: 'assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png')));
+                          setState(() {});
                         },
                         child: Card(
                           elevation: 5,
@@ -157,80 +155,168 @@ class _MyMarkersState extends State<MyMarkers> {
                           color: Color(0xFFFCFCFC),
                           child: Row(
                             children: [
-                              Container(
-                                height: cardHeight,
-                                width: 20,
-                                decoration: BoxDecoration(
-                                    color: (markerInfo.getPercentage() >= 50) ? ThemeOne().more50 : ThemeOne().less50,
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(edgeCornerRadius),
-                                      topRight: Radius.circular(1.0),
-                                      bottomLeft: Radius.circular(edgeCornerRadius),
-                                      bottomRight: Radius.circular(1.0),
-                                    )),
+                              Row(
+                                children: [
+                                  Container(
+                                    height: cardHeight,
+                                    width: 20,
+                                    decoration: BoxDecoration(
+                                        color: (markerInfo.getPercentage() >= 50) ? ThemeOne().more50 : ThemeOne().less50,
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(edgeCornerRadius),
+                                          topRight: Radius.circular(1.0),
+                                          bottomLeft: Radius.circular(edgeCornerRadius),
+                                          bottomRight: Radius.circular(1.0),
+                                        )),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Container(
+                                    width: 50,
+                                    height: 50,
+                                    child: Image.asset('assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png'),
+                                    // child: Image.asset('assets/dps_marker.png'),
+                                  ),
+                                  Container(
+                                    height: cardHeight,
+                                    width: MediaQuery.of(context).size.width / 1.8,
+                                    child: Column(
+                                      children: [
+                                        SizedBox(
+                                          height: (cardHeight - 2 * cardHeight / 2.5) / 2,
+                                        ),
+                                        Container(
+                                          height: cardHeight / 2.5,
+                                          width: MediaQuery.of(context).size.width / 2.4,
+                                          child: Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 10,
+                                              ),
+                                              Container(
+                                                width: cardHeight / 2.5,
+                                                height: cardHeight / 2.5,
+                                                child: Image.asset('assets/heart_like.png'),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(bottom: 5),
+                                                child: Text(
+                                                  '- ${markerInfo.getHumanReadablePercentage()} %',
+                                                  style: TextStyle(fontSize: 40),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          height: cardHeight / 2.5,
+                                          child: Center(
+                                            child: Text(
+                                              'Подтверждений: ${markerInfo.confirmsFor}',
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                ],
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                width: 50,
-                                height: 50,
-                                child: Image.asset('assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png'),
-                                // child: Image.asset('assets/dps_marker.png'),
-                              ),
-                              Container(
-                                height: cardHeight,
-                                width: MediaQuery.of(context).size.width / 1.8,
-                                child: Column(
+
+                              /*
+                              InkWell(
+                                onTap: () async {
+                                  await Navigator.push(
+                                      context,
+                                      CupertinoPageRoute(
+                                          builder: (context) => MarkerPage(
+                                              markerInfo: markerInfo,
+                                              imagePath: 'assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png')));
+                                  setState(() {});
+                                },
+                                child: Row(
                                   children: [
+                                    Container(
+                                      height: cardHeight,
+                                      width: 20,
+                                      decoration: BoxDecoration(
+                                          color: (markerInfo.getPercentage() >= 50) ? ThemeOne().more50 : ThemeOne().less50,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(edgeCornerRadius),
+                                            topRight: Radius.circular(1.0),
+                                            bottomLeft: Radius.circular(edgeCornerRadius),
+                                            bottomRight: Radius.circular(1.0),
+                                          )),
+                                    ),
                                     SizedBox(
-                                      height: (cardHeight - 2 * cardHeight / 2.5) / 2,
+                                      width: 10,
                                     ),
                                     Container(
-                                      height: cardHeight / 2.5,
-                                      width: MediaQuery.of(context).size.width / 2.4,
-                                      child: Row(
+                                      width: 50,
+                                      height: 50,
+                                      child: Image.asset('assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png'),
+                                      // child: Image.asset('assets/dps_marker.png'),
+                                    ),
+                                    Container(
+                                      height: cardHeight,
+                                      width: MediaQuery.of(context).size.width / 1.8,
+                                      child: Column(
                                         children: [
                                           SizedBox(
-                                            width: 10,
+                                            height: (cardHeight - 2 * cardHeight / 2.5) / 2,
                                           ),
                                           Container(
-                                            width: cardHeight / 2.5,
                                             height: cardHeight / 2.5,
-                                            child: Image.asset('assets/heart_like.png'),
+                                            width: MediaQuery.of(context).size.width / 2.4,
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Container(
+                                                  width: cardHeight / 2.5,
+                                                  height: cardHeight / 2.5,
+                                                  child: Image.asset('assets/heart_like.png'),
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(bottom: 5),
+                                                  child: Text(
+                                                    '- ${markerInfo.getHumanReadablePercentage()} %',
+                                                    style: TextStyle(fontSize: 40),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(bottom: 5),
-                                            child: Text(
-                                              '- ${markerInfo.getHumanReadablePercentage()} %',
-                                              style: TextStyle(fontSize: 40),
+                                          Container(
+                                            height: cardHeight / 2.5,
+                                            child: Center(
+                                              child: Text(
+                                                'Подтверждений: ${markerInfo.confirmsFor}',
+                                                style: TextStyle(fontSize: 20),
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    Container(
-                                      height: cardHeight / 2.5,
-                                      child: Center(
-                                        child: Text(
-                                          'Подтверждений: ${markerInfo.confirmsFor}',
-                                          style: TextStyle(fontSize: 20),
-                                        ),
-                                      ),
+                                    SizedBox(
+                                      width: 10,
                                     ),
                                   ],
                                 ),
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              GestureDetector(
-                                onTap: openMap(),
-                                child: Container(
-                                  width: cardHeight / 2.3,
-                                  height: cardHeight / 2.5,
-                                  child: Image.asset('assets/geo_icon_button.png'),
-                                ),
+
+                               */
+                              Container(
+                                width: cardHeight / 2.3,
+                                height: cardHeight / 2.5,
+                                // child: Image.asset('assets/geo_icon_button.png'),
+                                child: Icon(Icons.arrow_forward_ios_outlined),
                               ),
                             ],
                           ),
@@ -307,8 +393,9 @@ class _MyMarkersState extends State<MyMarkers> {
           )),
     );
   }
-}
 
-openMap() {
-  //TODO функция, которая открывает карту с переданной меткой.
+  openMap() {
+    print('openMap');
+    //TODO функция, которая открывает карту с переданной меткой.
+  }
 }

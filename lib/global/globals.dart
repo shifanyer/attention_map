@@ -9,3 +9,4 @@ GoogleMapController googleMapController;
 Map<String, MarkerInfo> userMarkers;
 bool isDarkTheme = false;
 bool isNotificationsOn = true;
+bool isMapOpened = true;

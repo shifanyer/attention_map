@@ -9,6 +9,7 @@ import '../global/globals.dart' as globals;
 
 class MarkerScale extends StatefulWidget {
   MarkerInfo markerInfo;
+
   // Map<MarkerId, int> userDecisions;
 
   MarkerScale({Key key, @required this.markerInfo}) : super(key: key);
@@ -17,7 +18,7 @@ class MarkerScale extends StatefulWidget {
   _MarkerScaleState createState() => _MarkerScaleState();
 }
 
-class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
+class _MarkerScaleState extends State<MarkerScale> with ThemeOne {
   double boxSize;
   double spaceBetween;
   double lineHeight;
@@ -50,8 +51,8 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
             children: [
               Container(
                 width: boxSize * 2,
-                child: FloatingActionButton(
-                  onPressed: () {
+                child: GestureDetector(
+                  onTap: () {
                     setState(() {
                       if (globals.userDecisions[widget.markerInfo.getMarkerId()] != 1) {
                         if (globals.userDecisions[widget.markerInfo.getMarkerId()] == -1) {
@@ -70,8 +71,14 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                       // widget.userDecisions[widget.markerInfo.getMarkerId()] = 1;
                     });
                   },
-                  backgroundColor: forColor,
-                  child: Container(width: boxSize, height: boxSize, child: Image.asset('assets/likeUPD.png', fit: BoxFit.fill)),
+                  child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: forColor,
+                      ),
+                      child: Center(child: Container(width: boxSize, height: boxSize, child: Image.asset('assets/likeUPD.png', fit: BoxFit.fill)))),
                 ),
               ),
               SizedBox(
@@ -142,13 +149,13 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
             children: [
               Container(
                 width: boxSize * 2,
-                child: FloatingActionButton(
-                  onPressed: () {
+                child: GestureDetector(
+                  onTap: () {
                     setState(() {
                       if (globals.userDecisions[widget.markerInfo.getMarkerId()] != -1) {
                         if (globals.userDecisions[widget.markerInfo.getMarkerId()] == 1) {
                           confirmsFor--;
-                          widget.markerInfo.confirmsFor --;
+                          widget.markerInfo.confirmsFor--;
                           DbMainMethods.plusConfirmsFor(widget.markerInfo, addValue: -1);
                         }
                         confirmsAgainst++;
@@ -159,8 +166,15 @@ class _MarkerScaleState extends State<MarkerScale> with ThemeOne{
                       }
                     });
                   },
-                  backgroundColor: againstColor,
-                  child: Container(width: boxSize, height: boxSize, child: Image.asset('assets/dislikeUPD.png', fit: BoxFit.fill)),
+                  child: Container(
+                      width: 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: againstColor,
+                      ),
+                      child:
+                          Center(child: Container(width: boxSize, height: boxSize, child: Image.asset('assets/dislikeUPD.png', fit: BoxFit.fill)))),
                 ),
               ),
               SizedBox(

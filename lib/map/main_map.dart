@@ -28,8 +28,7 @@ class MainMap extends StatefulWidget {
   final List<MarkerInfo> markersList;
   final Map<MarkerType, BitmapDescriptor> customMarkers;
 
-  MainMap({Key key, this.startCameraPosition, @required this.markersList, @required this.customMarkers})
-      : super(key: key);
+  MainMap({Key key, this.startCameraPosition, @required this.markersList, @required this.customMarkers}) : super(key: key);
 
   @override
   _MainMapState createState() => _MainMapState();
@@ -118,7 +117,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
   void _onMapCreated(GoogleMapController _cntlr) {
     globals.googleMapController = _cntlr;
-    if (followLocation) {
+    if ((followLocation) && (globals.isMapOpened)) {
       isAutoCameraMove = true;
       globals.googleMapController.animateCamera(
         CameraUpdate.newCameraPosition(
@@ -232,7 +231,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
                               child: IconButton(
                                 onPressed: () {
                                   followLocation = !followLocation;
-                                  if (followLocation) {
+                                  if ((followLocation) && (globals.isMapOpened)) {
                                     isAutoCameraMove = true;
                                     globals.googleMapController.animateCamera(
                                       CameraUpdate.newCameraPosition(
@@ -386,30 +385,32 @@ class _MainMapState extends State<MainMap> with MapHelper {
     widget.startCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
 
     location.onLocationChanged.listen((LocationData currentLocation) async {
-      prevDot = initialCameraPosition;
-      Set<String> updatedCentersSet = getCentersSet(currentLocation);
-      if (!centersSet.containsAll(updatedCentersSet)) {
-        centersSet = updatedCentersSet;
-        await updateMarkers();
-      }
+      if (globals.isMapOpened) {
+        prevDot = initialCameraPosition;
+        Set<String> updatedCentersSet = getCentersSet(currentLocation);
+        if (!centersSet.containsAll(updatedCentersSet)) {
+          centersSet = updatedCentersSet;
+          await updateMarkers();
+        }
 
-      // Zoom при перемещении обратно к геопозиции не меняется, если отдалиться или приблизиться
-      if (globals.googleMapController != null) {
-        zoomValue = await globals.googleMapController.getZoomLevel();
-      }
-      if (followLocation) {
-        var bearing = calculateBearing(prevDot, LatLng(_currentPosition.latitude, _currentPosition.longitude));
-        isAutoCameraMove = true;
-        globals.googleMapController.animateCamera(
-          CameraUpdate.newCameraPosition(
-            CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
-          ),
-        );
-      }
+        // Zoom при перемещении обратно к геопозиции не меняется, если отдалиться или приблизиться
+        if ((globals.googleMapController != null) && (globals.isMapOpened)) {
+          zoomValue = await globals.googleMapController.getZoomLevel();
+        }
+        if ((followLocation) && (globals.isMapOpened)) {
+          var bearing = calculateBearing(prevDot, LatLng(_currentPosition.latitude, _currentPosition.longitude));
+          isAutoCameraMove = true;
+          globals.googleMapController.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(target: LatLng(currentLocation.latitude, currentLocation.longitude), zoom: zoomValue, tilt: 15.0, bearing: 25),
+            ),
+          );
+        }
 
-      _currentPosition = currentLocation;
-      initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
-      widget.startCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+        _currentPosition = currentLocation;
+        initialCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+        widget.startCameraPosition = LatLng(_currentPosition.latitude, _currentPosition.longitude);
+      }
     });
   }
 
@@ -468,9 +469,8 @@ class _MainMapState extends State<MainMap> with MapHelper {
           Navigator.push(
               context,
               CupertinoPageRoute(
-                  builder: (context) => MarkerPage(
-                      markerInfo: dbMarker,
-                      imagePath: markerImageAssets[markerTypesList.indexOf(dbMarker.markerType)])));
+                  builder: (context) =>
+                      MarkerPage(markerInfo: dbMarker, imagePath: markerImageAssets[markerTypesList.indexOf(dbMarker.markerType)])));
           return;
 
           if (followLocation) {
