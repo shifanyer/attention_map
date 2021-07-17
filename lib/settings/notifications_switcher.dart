@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../global/globals.dart' as globals;
 
-class ThemeSwitcher extends StatefulWidget {
+class NotificationsSwitcher extends StatefulWidget {
   @override
-  _ThemeSwitcherState createState() => _ThemeSwitcherState();
+  _NotificationsSwitcherState createState() => _NotificationsSwitcherState();
 }
 
-class _ThemeSwitcherState extends State<ThemeSwitcher> {
+class _NotificationsSwitcherState extends State<NotificationsSwitcher> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +25,7 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                child: Text('Тёмная тема', style: TextStyle(fontSize: 22.0),),
+                child: Text('PUSH - уведомленя', style: TextStyle(fontSize: 22.0),),
               ),
             ),
           ),
@@ -34,10 +34,10 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: Switch(
-                value: globals.isDarkTheme,
+                value: globals.isNotificationsOn,
                 onChanged: (value) {
                   setState(() {
-                    globals.isDarkTheme = value;
+                    globals.isNotificationsOn = value;
                   });
                 },
                 activeColor: Colors.white,

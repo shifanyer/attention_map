@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../global/globals.dart' as globals;
 
-class ThemeSwitcher extends StatefulWidget {
+class LanguageSwitcher extends StatefulWidget {
   @override
-  _ThemeSwitcherState createState() => _ThemeSwitcherState();
+  _LanguageSwitcherState createState() => _LanguageSwitcherState();
 }
 
-class _ThemeSwitcherState extends State<ThemeSwitcher> {
+class _LanguageSwitcherState extends State<LanguageSwitcher> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +25,7 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                child: Text('Тёмная тема', style: TextStyle(fontSize: 22.0),),
+                child: Text('Язык', style: TextStyle(fontSize: 22.0),),
               ),
             ),
           ),
@@ -33,15 +33,7 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
             alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Switch(
-                value: globals.isDarkTheme,
-                onChanged: (value) {
-                  setState(() {
-                    globals.isDarkTheme = value;
-                  });
-                },
-                activeColor: Colors.white,
-              ),
+              child: Icon(Icons.ac_unit_sharp),
             ),
           ),
         ],

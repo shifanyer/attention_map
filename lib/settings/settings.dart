@@ -1,12 +1,15 @@
+import 'package:attention_map/settings/language_switcher.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'notifications_switcher.dart';
 import 'theme_switcher.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    double switchersLeftPadding = MediaQuery.of(context).size.width * 0.1;
+    double switchersLeftPadding = MediaQuery.of(context).size.width * 0.05;
+    var dividerWidth = MediaQuery.of(context).size.width * 0.9;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -57,7 +60,7 @@ class SettingsPage extends StatelessWidget {
 
               Center(
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
+                  width: dividerWidth,
                   child: Divider(
                     thickness: 2,
                   ),
@@ -82,7 +85,7 @@ class SettingsPage extends StatelessWidget {
 
               Center(
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
+                  width: dividerWidth,
                   child: Divider(
                     thickness: 2,
                   ),
@@ -98,7 +101,7 @@ class SettingsPage extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: Padding(
                     padding: EdgeInsets.only(left: 10.0 + switchersLeftPadding),
-                    child: ThemeSwitcher(),
+                    child: LanguageSwitcher(),
                   )),
 
               SizedBox(
@@ -107,7 +110,7 @@ class SettingsPage extends StatelessWidget {
 
               Center(
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.8,
+                  width: dividerWidth,
                   child: Divider(
                     thickness: 2,
                   ),
@@ -123,7 +126,7 @@ class SettingsPage extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: Padding(
                     padding: EdgeInsets.only(left: 10.0 + switchersLeftPadding),
-                    child: ThemeSwitcher(),
+                    child: NotificationsSwitcher(),
                   )),
 
               SizedBox(
