@@ -1,7 +1,7 @@
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/local_db/write_in_file.dart';
-import 'package:attention_map/map_objects/marker_page.dart';
+import 'package:attention_map/marker_page/marker_page.dart';
 import 'package:attention_map/themes/theme_one.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

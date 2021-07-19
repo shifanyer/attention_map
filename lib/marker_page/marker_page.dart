@@ -4,6 +4,8 @@ import 'package:attention_map/map_objects/marker_scale.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'description_area.dart';
+
 class MarkerPage extends StatelessWidget {
   final MarkerInfo markerInfo;
   final String imagePath;
@@ -48,6 +50,7 @@ class MarkerPage extends StatelessWidget {
             ),
 
             // Картинки
+            /*
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.all(10),
@@ -110,8 +113,11 @@ class MarkerPage extends StatelessWidget {
                 ),
               ),
             ),
+            */
 
             //Описание
+            DescriptionArea(markerInfo: markerInfo,),
+            /*
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -127,22 +133,26 @@ class MarkerPage extends StatelessWidget {
                     SizedBox(
                       height: 10,
                     ),
-                    Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5.0)), border: Border.all(width: 1, color: Colors.blueGrey)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(6.0),
-                          child: Text(
-                            'На краю дороги стоял дуб. Он был, вероятно, в десять раз старше берез, составлявших лес, в десять раз толще и в два раза выше каждой березы. Это был огромный, в два обхвата дуб, с обломанными суками и корой, заросшей старыми болячками. С огромными, неуклюже, несимметрично растопыренными корявыми руками и пальцами, он старым, сердитым и презрительным уродом стоял между улыбающимися березами. Только он один не хотел подчиниться обаянию весны и не хотел видеть ни весны ни солнца.',
-                            maxLines: 500,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 17),
-                          ),
-                        ))
+                    GestureDetector(
+                      child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5.0)), border: Border.all(width: 1, color: Colors.blueGrey)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(6.0),
+                            child: SelectableText(
+                              'На краю дороги стоял дуб. Он был, вероятно, в десять раз старше берез, составлявших лес, в десять раз толще и в два раза выше каждой березы. Это был огромный, в два обхвата дуб, с обломанными суками и корой, заросшей старыми болячками. С огромными, неуклюже, несимметрично растопыренными корявыми руками и пальцами, он старым, сердитым и презрительным уродом стоял между улыбающимися березами. Только он один не хотел подчиниться обаянию весны и не хотел видеть ни весны ни солнца.',
+                              // maxLines: 500,
+                              style: TextStyle(fontSize: 17),
+                            ),
+                          )),
+                    )
                   ],
                 ),
               ),
             ),
+
+             */
+            //Лайки/дислайки
 
             SliverToBoxAdapter(
               child: Align(
@@ -152,6 +162,8 @@ class MarkerPage extends StatelessWidget {
                   )),
             ),
 
+            //Комментарии
+            /*
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -306,6 +318,7 @@ class MarkerPage extends StatelessWidget {
                 ),
               ),
             ),
+            */
           ],
         ),
       ),

@@ -6,7 +6,7 @@ import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:attention_map/filters/marker_filters.dart';
 import 'package:attention_map/local_db/write_in_file.dart';
-import 'package:attention_map/map_objects/marker_page.dart';
+import 'package:attention_map/marker_page/marker_page.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:attention_map/map_objects/marker_scale.dart';
 import 'package:flutter/cupertino.dart';
@@ -437,7 +437,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
 
     for (var center in centersList) {
       if (((center.latitude - currentLocation.latitude).abs() <= 0.51) && ((center.longitude - currentLocation.longitude).abs() <= 0.51)) {
-        resSet.add(((center.latitude * 10).toString()).split('.').first + ((center.longitude * 10).toString()).split('.').first);
+        resSet.add(((center.latitude * 10).toString()).split('.').first + '_' + ((center.longitude * 10).toString()).split('.').first);
       }
     }
 
@@ -466,6 +466,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
         visible: (dbMarker.confirmsFor > 0) && (filtersList[markerTypesList.indexOf(dbMarker.markerType)]),
         infoWindow: InfoWindow(title: EnumMethods.getDescription(dbMarker.markerType), snippet: 'Подтвердили: ${dbMarker.confirmsFor}'),
         onTap: () async {
+          /*
           Navigator.push(
               context,
               CupertinoPageRoute(
@@ -473,6 +474,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
                       MarkerPage(markerInfo: dbMarker, imagePath: markerImageAssets[markerTypesList.indexOf(dbMarker.markerType)])));
           return;
 
+           */
           if (followLocation) {
             isAutoCameraMove = true;
             globals.googleMapController.animateCamera(

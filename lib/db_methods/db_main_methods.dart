@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
@@ -17,31 +18,42 @@ class DbMainMethods {
     var markerId = (pointCoordinates.latitude * 1000).truncate().toString() + (pointCoordinates.longitude * 1000).truncate().toString();
     bool isUpload = true;
     var nowTime = DateTime.now().millisecondsSinceEpoch;
+    var minDist = -1.0;
+    var pointCenter = LatLng(0.0, 0.0);
     for (var center in centers) {
-      var newItem = FirebaseDatabase.instance.reference().child(center).child(pointType).child(markerId);
-      var itemObj = await newItem.once();
-      if (itemObj?.value == null) {
-        if (isUpload) {
-          var newMarker = MarkerInfo(
-              markerType: markerType,
-              coordinates: LatLng(pointCoordinates.latitude, pointCoordinates.longitude),
-              confirmsFor: 1,
-              confirmsAgainst: 0,
-              lastTimeConfirmation: nowTime);
-          globals.userMarkers[newMarker.getMarkerId().value] = newMarker;
-          FileOperations.writeUserMarkers();
-        }
-        newItem.child('coordX').set(pointCoordinates.latitude);
-        newItem.child('coordY').set(pointCoordinates.longitude);
-        newItem.child('confirms').child('for').set(1);
-        newItem.child('creation_time').set(nowTime);
-        newItem.child('last_confirm_time').set(nowTime);
-        isUpload = false;
-      } else {
-        isUpload = false;
-        newItem.child('confirms').child('for').set(itemObj?.value['confirms']['for'] + 1);
-        newItem.child('last_confirm_time').set(nowTime);
+      var radiusCenter = LatLng(int.parse(center.split('_').first) / 10, int.parse(center.split('_').last) / 10);
+      var dist = pow((radiusCenter.latitude - pointCoordinates.latitude), 2) + pow((radiusCenter.longitude - pointCoordinates.longitude), 2);
+      if ((minDist == -1.0) || (dist < minDist)) {
+        minDist = dist;
+        pointCenter = radiusCenter;
       }
+    }
+
+    var pointCenterString = (pointCenter.latitude * 10).truncate().toString() + '_' + (pointCenter.longitude * 10).truncate().toString();
+
+    var newItem = FirebaseDatabase.instance.reference().child(pointCenterString).child(pointType).child(markerId);
+    var itemObj = await newItem.once();
+    if (itemObj?.value == null) {
+      if (isUpload) {
+        var newMarker = MarkerInfo(
+            markerType: markerType,
+            coordinates: LatLng(pointCoordinates.latitude, pointCoordinates.longitude),
+            confirmsFor: 1,
+            confirmsAgainst: 0,
+            lastTimeConfirmation: nowTime);
+        globals.userMarkers[newMarker.getMarkerId().value] = newMarker;
+        FileOperations.writeUserMarkers();
+      }
+      newItem.child('coordX').set(pointCoordinates.latitude);
+      newItem.child('coordY').set(pointCoordinates.longitude);
+      newItem.child('confirms').child('for').set(1);
+      newItem.child('creation_time').set(nowTime);
+      newItem.child('last_confirm_time').set(nowTime);
+      isUpload = false;
+    } else {
+      isUpload = false;
+      newItem.child('confirms').child('for').set(itemObj?.value['confirms']['for'] + 1);
+      newItem.child('last_confirm_time').set(nowTime);
     }
   }
 
@@ -62,10 +74,11 @@ class DbMainMethods {
   static Future<List<MarkerInfo>> downloadPointsList(List<String> centers) async {
     var markers = <MarkerInfo>[];
     for (var center in centers) {
+      print('center: ${center}');
       DatabaseReference camerasDatabaseReference = FirebaseDatabase.instance.reference().child(center);
       var radiusSnapshot = await camerasDatabaseReference.once();
       if (radiusSnapshot?.value == null) {
-        return [];
+        continue;
       }
       for (var markerType in MarkerType.values) {
         var typedMap = radiusSnapshot?.value[EnumMethods.enumToString(markerType)] ?? {};

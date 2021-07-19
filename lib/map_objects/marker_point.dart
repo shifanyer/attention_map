@@ -8,13 +8,15 @@ class MarkerInfo {
   int confirmsFor;
   int confirmsAgainst;
   int lastTimeConfirmation;
+  String descriptionText;
 
   MarkerInfo(
       {@required this.markerType,
       @required this.coordinates,
       @required this.confirmsFor,
       @required this.confirmsAgainst,
-      @required this.lastTimeConfirmation});
+      @required this.lastTimeConfirmation,
+      this.descriptionText = ''});
 
   MarkerId getMarkerId() {
     return MarkerId(this.coordinates.latitude.toString() + '_' + coordinates.longitude.toString());
@@ -52,7 +54,7 @@ class MarkerInfo {
 
     for (var center in centersList) {
       if (((center.latitude - currentLocation.latitude).abs() <= 0.51) && ((center.longitude - currentLocation.longitude).abs() <= 0.51)) {
-        resSet.add(((center.latitude * 10).toString()).split('.').first + ((center.longitude * 10).toString()).split('.').first);
+        resSet.add(((center.latitude * 10).toString()).split('.').first + '_' + ((center.longitude * 10).toString()).split('.').first);
       }
     }
 
@@ -69,7 +71,8 @@ class MarkerInfo {
         coordinates = LatLng(json['coordX'], json['coordY']),
         confirmsFor = json['confirmsFor'],
         confirmsAgainst = json['confirmsAgainst'],
-        lastTimeConfirmation = json['lastTimeConfirmation'];
+        lastTimeConfirmation = json['lastTimeConfirmation'],
+        descriptionText = json['descriptionText'];
 
   Map<String, dynamic> toJson() => {
         'markerType': markerType.toString(),
@@ -78,5 +81,6 @@ class MarkerInfo {
         'confirmsFor': confirmsFor,
         'confirmsAgainst': confirmsAgainst,
         'lastTimeConfirmation': lastTimeConfirmation,
+        'descriptionText': descriptionText,
       };
 }
