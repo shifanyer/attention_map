@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:attention_map/enums/marker_type.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -59,6 +61,27 @@ class MarkerInfo {
     }
 
     return resSet;
+  }
+
+  String dbCenter() {
+    var centersSet = getCentersSet();
+    var minDist = -1.0;
+    var pointCenter = LatLng(0.0, 0.0);
+    for (var center in centersSet) {
+      var radiusCenter = LatLng(int.parse(center.split('_').first) / 10, int.parse(center.split('_').last) / 10);
+      var dist = pow((radiusCenter.latitude - coordinates.latitude), 2) + pow((radiusCenter.longitude - coordinates.longitude), 2);
+      if ((minDist == -1.0) || (dist < minDist)) {
+        minDist = dist;
+        pointCenter = radiusCenter;
+      }
+    }
+
+    var pointCenterString = (pointCenter.latitude * 10).truncate().toString() + '_' + (pointCenter.longitude * 10).truncate().toString();
+    return pointCenterString;
+  }
+
+  String dbMarkerId() {
+    return (coordinates.latitude * 1000).truncate().toString() + '_' + (coordinates.longitude * 1000).truncate().toString();
   }
 
   @override

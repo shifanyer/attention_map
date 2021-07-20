@@ -21,7 +21,7 @@ class BottomBar extends StatefulWidget {
 
 /// This is the private State class that goes with MyStatefulWidget.
 class _BottomBarState extends State<BottomBar> {
-  int _selectedIndex = 1;
+  int _selectedIndex;
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
   // static const List<Widget> _widgetOptions = <Widget>[
@@ -43,6 +43,7 @@ class _BottomBarState extends State<BottomBar> {
 
   @override
   void initState() {
+    _selectedIndex = 1;
     widgetOptions = <Widget>[
       MyMarkers(),
       MainMap(

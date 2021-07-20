@@ -43,7 +43,8 @@ class MyApp extends StatelessWidget {
       DbMainMethods.downloadPointsList(['0']).then((value) => markersList = value),
       loadMarkers().then((value) => markers = value),
       FileOperations.readUserDecisions(),
-      FileOperations.readUserMarkers()
+      FileOperations.readUserMarkers(),
+      FileOperations.readUserData(),
     ]);
     return MaterialApp(
       title: 'Flutter Google Maps Demo',

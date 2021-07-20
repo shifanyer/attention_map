@@ -1,3 +1,5 @@
+import 'package:attention_map/db_methods/db_main_methods.dart';
+import 'package:attention_map/local_db/write_in_file.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,6 +57,8 @@ class _EditDescriptionAreaState extends State<EditDescriptionArea> {
               child: IconButton(
                 onPressed: () {
                   widget.markerInfo.descriptionText = _descriptionController.text;
+                  DbMainMethods.addDescriptionText(widget.markerInfo, _descriptionController.text);
+                  FileOperations.writeUserMarkers();
                   Navigator.pop(context);
                 },
                 icon: Icon(

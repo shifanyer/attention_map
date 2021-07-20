@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -23,9 +24,9 @@ class FileOperations {
     return File('$path/userMarkers.txt');
   }
 
-  static Future<File> get _localFile async {
+  static Future<File> get _userData async {
     final path = await _localPath;
-    return File('$path/counter.txt');
+    return File('$path/userData.txt');
   }
 
   static Future<void> writeUserDecisions() async {
@@ -58,7 +59,6 @@ class FileOperations {
     // print('writtenFile: ${writtenFile}');
   }
 
-
   static Future<void> readUserMarkers() async {
     try {
       final file = await _userMarkers;
@@ -72,4 +72,33 @@ class FileOperations {
     }
   }
 
+  static Future<void> writeUserData() async {
+    final file = await _userData;
+    file.writeAsStringSync(jsonEncode(globals.userData));
+    // var writtenFile = json.decode((file?.readAsStringSync()) ?? '');
+    // print('writtenFile: ${writtenFile}');
+  }
+
+  static Future<void> readUserData() async {
+    try {
+      final file = await _userData;
+      Map writtenFile = json.decode((file?.readAsStringSync()) ?? '');
+      globals.userData = writtenFile.map((key, value) {
+            if (key == 'avatar') {
+              List<int> avatarList = [];
+              for (var item in value) {
+                avatarList.add(item as int);
+              }
+              return MapEntry(key, Uint8List.fromList(avatarList));
+            }
+            return MapEntry(key, value);
+          }) ??
+          {};
+      return true;
+    } catch (e) {
+      globals.userData = {};
+      print('err: ${e}');
+      return false;
+    }
+  }
 }

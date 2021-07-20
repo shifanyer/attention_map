@@ -32,7 +32,12 @@ class _DescriptionAreaState extends State<DescriptionArea> {
             ),
             GestureDetector(
               onTap: () async {
-                await Navigator.push(context, CupertinoPageRoute(builder: (context) => EditDescriptionArea(markerInfo: widget.markerInfo,)));
+                await Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => EditDescriptionArea(
+                              markerInfo: widget.markerInfo,
+                            )));
                 setState(() {});
               },
               child: Container(
@@ -42,12 +47,19 @@ class _DescriptionAreaState extends State<DescriptionArea> {
                   child: Padding(
                     padding: const EdgeInsets.all(6.0),
                     child: SelectableText(
-                      widget?.markerInfo?.descriptionText ?? 'Нажмите, чтобы добавить описание',
+                      (widget?.markerInfo?.descriptionText == null)
+                          ? 'Нажмите, чтобы добавить описание'
+                          : ((widget.markerInfo.descriptionText == '') ? 'Нажмите, чтобы добавить описание' : widget.markerInfo.descriptionText),
                       // overflow: TextOverflow.ellipsis,
                       // maxLines: 500,
                       style: TextStyle(fontSize: 17),
                       onTap: () async {
-                        await Navigator.push(context, CupertinoPageRoute(builder: (context) => EditDescriptionArea(markerInfo: widget.markerInfo,)));
+                        await Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                                builder: (context) => EditDescriptionArea(
+                                      markerInfo: widget.markerInfo,
+                                    )));
                         setState(() {});
                       },
                     ),
