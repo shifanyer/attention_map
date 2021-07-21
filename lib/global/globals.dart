@@ -13,3 +13,4 @@ bool isDarkTheme = false;
 bool isNotificationsOn = true;
 bool isMapOpened = true;
 Map<String, dynamic> userData = {};
+String languages = 'ru';

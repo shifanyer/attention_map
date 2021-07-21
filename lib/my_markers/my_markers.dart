@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../global/globals.dart' as globals;
+import '../global/languages.dart' as languages;
 
 class MyMarkers extends StatefulWidget with ThemeOne {
   @override
@@ -184,7 +185,7 @@ class _MyMarkersState extends State<MyMarkers> {
                                           height: cardHeight / 2.5,
                                           child: Center(
                                             child: Text(
-                                              'Подтверждений: ${markerInfo.confirmsFor}',
+                                              '${languages.textsMap[globals.languages]['my_markers']['my_markers']['confirms']}: ${markerInfo.confirmsFor}',
                                               style: TextStyle(fontSize: 20),
                                             ),
                                           ),
@@ -221,7 +222,7 @@ class _MyMarkersState extends State<MyMarkers> {
         elevation: 5,
         title: Center(
           child: Text(
-            'Мои маркеры',
+            languages.textsMap[globals.languages]['my_markers']['my_markers']['app_bar'],
             style: TextStyle(
               color: Color(0xFF5C5C5C),
               fontSize: 45,

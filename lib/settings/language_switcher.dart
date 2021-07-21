@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../global/globals.dart' as globals;
+import '../global/languages.dart' as languages;
 
 class LanguageSwitcher extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                child: Text('Язык', style: TextStyle(fontSize: 22.0),),
+                child: Text(languages.textsMap[globals.languages]['settings']['language_switcher']['language'], style: TextStyle(fontSize: 22.0),),
               ),
             ),
           ),
@@ -33,7 +34,18 @@ class _LanguageSwitcherState extends State<LanguageSwitcher> {
             alignment: Alignment.centerRight,
             child: Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Icon(Icons.ac_unit_sharp),
+              child: IconButton(
+                  icon: Icon(Icons.ac_unit_sharp),
+                onPressed: () {
+                    setState(() {
+                      if (globals.languages == 'ru') {
+                        globals.languages = 'en';
+                      }
+                      else {
+                        globals.languages = 'ru';
+                      }
+                    });
+                },),
             ),
           ),
         ],

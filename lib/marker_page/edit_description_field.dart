@@ -3,6 +3,8 @@ import 'package:attention_map/local_db/write_in_file.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../global/languages.dart' as languages;
+import '../global/globals.dart' as globals;
 
 class EditDescriptionArea extends StatefulWidget {
   MarkerInfo markerInfo;
@@ -33,7 +35,7 @@ class _EditDescriptionAreaState extends State<EditDescriptionArea> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Добавьте описание'),
+        title: Text(languages.textsMap[globals.languages]['marker_page']['edit_description_field']['app_bar']),
       ),
       body: ListView(
         children: [
@@ -46,7 +48,7 @@ class _EditDescriptionAreaState extends State<EditDescriptionArea> {
               maxLines: null,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
-                labelText: 'Текст описания',
+                labelText: languages.textsMap[globals.languages]['marker_page']['edit_description_field']['description_text'],
               ),
             ),
           ),

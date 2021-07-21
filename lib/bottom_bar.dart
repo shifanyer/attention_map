@@ -86,6 +86,8 @@ class _BottomBarState extends State<BottomBar> {
       bottomNavigationBar: SizedBox(
         height: globals.bottomHeight,
         child: BottomNavigationBar(
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.assistant_photo),

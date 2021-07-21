@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../global/globals.dart' as globals;
+import '../global/languages.dart' as languages;
 
 class ThemeSwitcher extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _ThemeSwitcherState extends State<ThemeSwitcher> {
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                child: Text('Тёмная тема', style: TextStyle(fontSize: 22.0),),
+                child: Text(languages.textsMap[globals.languages]['settings']['theme_switcher']['theme'], style: TextStyle(fontSize: 22.0),),
               ),
             ),
           ),

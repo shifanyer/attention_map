@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../global/languages.dart' as languages;
+import '../global/globals.dart' as globals;
 
 class MarkerFilters extends StatefulWidget {
   List<bool> filters;
-  List<String> filtersNames;
+  List filtersNames;
 
   MarkerFilters({Key key, @required this.filters, @required this.filtersNames}) : super(key: key);
 
@@ -16,7 +18,8 @@ class _MarkerFiltersState extends State<MarkerFilters> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Фильтры'),
+        // title: const Text('Фильтры'),
+        title: Text(languages.textsMap[globals.languages]['filters']['marker_filters']['app_bar']),
       ),
       body: ListView.builder(
         scrollDirection: Axis.vertical,
@@ -42,7 +45,7 @@ class _MarkerFiltersState extends State<MarkerFilters> {
             }
           });
         },
-        label: Text('Сбросить'),
+        label: Text(languages.textsMap[globals.languages]['filters']['marker_filters']['cancel']),
       ),
     );
     throw UnimplementedError();

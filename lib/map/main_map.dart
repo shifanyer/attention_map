@@ -22,6 +22,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'bottom_choose_list.dart';
 import 'map_helper.dart';
 import '../global/globals.dart' as globals;
+import '../global/languages.dart' as languages;
 
 class MainMap extends StatefulWidget {
   LatLng startCameraPosition;
@@ -51,7 +52,15 @@ class _MainMapState extends State<MainMap> with MapHelper {
   LatLng prevDot;
   Set<Circle> circles = {};
 
-  static const typesList = ['Камера', 'Достопримечательность', 'Пост ДПС', 'Опасный участок дороги', 'ДТП', 'Нужна помощь', 'Другое'];
+  var typesList = [
+    languages.textsMap[globals.languages]['map']['main_map']['typesList']['camera'],
+    languages.textsMap[globals.languages]['map']['main_map']['typesList']['monument'],
+    languages.textsMap[globals.languages]['map']['main_map']['typesList']['dps'],
+    languages.textsMap[globals.languages]['map']['main_map']['typesList']['danger'],
+    languages.textsMap[globals.languages]['map']['main_map']['typesList']['dtp'],
+    languages.textsMap[globals.languages]['map']['main_map']['typesList']['help'],
+    languages.textsMap[globals.languages]['map']['main_map']['typesList']['other']
+  ];
 
   var filtersList = [true, true, true, true, true, true, true];
 
@@ -218,7 +227,6 @@ class _MainMapState extends State<MainMap> with MapHelper {
                                                   filtersNames: typesList,
                                                 )));
                                     updateMarkers();
-                                    print('Filters');
                                   })),
                           Padding(
                             padding: EdgeInsets.only(

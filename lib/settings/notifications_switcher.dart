@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../global/globals.dart' as globals;
+import '../global/languages.dart' as languages;
 
 class NotificationsSwitcher extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _NotificationsSwitcherState extends State<NotificationsSwitcher> {
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Container(
-                child: Text('PUSH - уведомленя', style: TextStyle(fontSize: 22.0),),
+                child: Text(languages.textsMap[globals.languages]['settings']['notifications_switcher']['notifications'], style: TextStyle(fontSize: 22.0),),
               ),
             ),
           ),

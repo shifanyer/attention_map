@@ -2,6 +2,8 @@ import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:attention_map/marker_page/edit_description_field.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../global/languages.dart' as languages;
+import '../global/globals.dart' as globals;
 
 class DescriptionArea extends StatefulWidget {
   MarkerInfo markerInfo;
@@ -23,7 +25,7 @@ class _DescriptionAreaState extends State<DescriptionArea> {
             Container(
                 width: MediaQuery.of(context).size.width,
                 child: Text(
-                  'Описание:',
+                  languages.textsMap[globals.languages]['marker_page']['description_area']['description'],
                   textAlign: TextAlign.left,
                   style: TextStyle(fontSize: 28),
                 )),
@@ -47,9 +49,9 @@ class _DescriptionAreaState extends State<DescriptionArea> {
                   child: Padding(
                     padding: const EdgeInsets.all(6.0),
                     child: SelectableText(
-                      (widget?.markerInfo?.descriptionText == null)
-                          ? 'Нажмите, чтобы добавить описание'
-                          : ((widget.markerInfo.descriptionText == '') ? 'Нажмите, чтобы добавить описание' : widget.markerInfo.descriptionText),
+                      ((widget?.markerInfo?.descriptionText == null) || (widget.markerInfo.descriptionText == ''))
+                          ? languages.textsMap[globals.languages]['marker_page']['description_area']['empty_text']
+                          : widget.markerInfo.descriptionText,
                       // overflow: TextOverflow.ellipsis,
                       // maxLines: 500,
                       style: TextStyle(fontSize: 17),
