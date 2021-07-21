@@ -8,10 +8,16 @@ import 'description_area.dart';
 
 class MarkerPage extends StatelessWidget {
   final MarkerInfo markerInfo;
-  final String imagePath;
+  final bool blockEdit;
+  // final String imagePath;
   double imagesBorderRadius = 25.0;
 
-  MarkerPage({Key key, @required this.markerInfo, @required this.imagePath}) : super(key: key);
+  MarkerPage({
+    Key key,
+    @required this.markerInfo,
+    @required this.blockEdit,
+    // @required this.imagePath
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +39,7 @@ class MarkerPage extends StatelessWidget {
                       width: MediaQuery.of(context).size.width / 7,
                       height: MediaQuery.of(context).size.width / 7,
                       child: Image.asset(
-                        imagePath,
+                        'assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png',
                         fit: BoxFit.contain,
                       ),
                     ),
@@ -116,7 +122,7 @@ class MarkerPage extends StatelessWidget {
             */
 
             //Описание
-            DescriptionArea(markerInfo: markerInfo,),
+            DescriptionArea(markerInfo: markerInfo, blockEdit: blockEdit,),
             /*
             SliverToBoxAdapter(
               child: Padding(

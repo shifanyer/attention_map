@@ -107,7 +107,7 @@ class _MyMarkersState extends State<MyMarkers> {
                         setState(() {
                           globals.userMarkers.remove(markerInfo.getMarkerId().value);
                           FileOperations.writeUserMarkers();
-                          //TODO добавить удаление из БД
+                          DbMainMethods.deletePoint(markerInfo);
                         });
                       },
                       child: GestureDetector(
@@ -116,7 +116,7 @@ class _MyMarkersState extends State<MyMarkers> {
                               context,
                               CupertinoPageRoute(
                                   builder: (context) => MarkerPage(
-                                      markerInfo: markerInfo, imagePath: 'assets/${EnumMethods.enumToString(markerInfo.markerType)}_marker.png')));
+                                      markerInfo: markerInfo, blockEdit: false,)));
                           setState(() {});
                         },
                         child: Card(

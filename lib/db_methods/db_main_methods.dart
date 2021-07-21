@@ -188,4 +188,13 @@ class DbMainMethods {
     await FileOperations.writeUserMarkers();
     return true;
   }
+
+  static Future<void> deletePoint(MarkerInfo markerInfo) async {
+    var dbMarker = FirebaseDatabase.instance
+        .reference()
+        .child(markerInfo.dbCenter())
+        .child(EnumMethods.enumToString(markerInfo.markerType))
+        .child(markerInfo.dbMarkerId());
+    dbMarker.remove();
+  }
 }

@@ -101,6 +101,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
       initialCameraPosition = widget.startCameraPosition;
     }
     getLoc();
+    markers = globals.downloadedMarkers;
     super.initState();
   }
 
@@ -108,6 +109,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
   Future<bool> customMarkersMaker(List<MarkerInfo> markersList) async {
     if (firstLoad) {
       //ДОБАВЛЕНИЕ ТОЧЕК В map точек
+      markers = [];
       dbMarkers = markersList;
       for (var dbMarker in markersList) {
         var dbMarkerId = dbMarker.getMarkerId();
@@ -140,6 +142,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
   Widget build(BuildContext context) {
     if (firstLoad) {
       //ДОБАВЛЕНИЕ ТОЧЕК В map точек
+      markers = [];
       dbMarkers = widget.markersList;
       for (var dbMarker in widget.markersList) {
         var dbMarkerId = dbMarker.getMarkerId();
@@ -500,6 +503,10 @@ class _MainMapState extends State<MainMap> with MapHelper {
               if (ifChangeMarkerInfo && (changeMarkerInfo == dbMarker)) {
                 ifChangeMarkerInfo = false;
                 globals.googleMapController.hideMarkerInfoWindow(dbMarker.getMarkerId());
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => MarkerPage(markerInfo: dbMarker, blockEdit: true,)));
               } else {
                 changeMarkerInfo = dbMarker;
               }
@@ -509,6 +516,7 @@ class _MainMapState extends State<MainMap> with MapHelper {
         // consumeTapEvents: true,
       ));
     }
+    globals.downloadedMarkers = markers;
 
     setState(() {});
   }
