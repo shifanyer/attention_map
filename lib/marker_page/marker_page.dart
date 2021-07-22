@@ -1,6 +1,7 @@
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/map_objects/marker_point.dart';
 import 'package:attention_map/map_objects/marker_scale.dart';
+import 'package:attention_map/marker_page/images_area.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +11,7 @@ class MarkerPage extends StatelessWidget {
   final MarkerInfo markerInfo;
   final bool blockEdit;
   // final String imagePath;
-  double imagesBorderRadius = 25.0;
+  // double imagesBorderRadius = 25.0;
 
   MarkerPage({
     Key key,
@@ -56,6 +57,7 @@ class MarkerPage extends StatelessWidget {
             ),
 
             // Картинки
+            ImagesArea(markerInfo: markerInfo,),
             /*
             SliverToBoxAdapter(
               child: Padding(

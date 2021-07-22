@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     var futures = Future.wait([
       Firebase.initializeApp(),
       DbMainMethods.downloadPointsList(['0']).then((value) => markersList = value),

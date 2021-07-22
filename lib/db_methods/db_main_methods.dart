@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:attention_map/enums/enumMethods.dart';
 import 'package:attention_map/enums/marker_type.dart';
@@ -9,6 +10,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'fire_storages/fire_storage_service.dart';
 import '../global/globals.dart' as globals;
 
@@ -17,11 +19,17 @@ class DbMainMethods {
     var pointType = EnumMethods.enumToString(markerType);
     var markerId = (pointCoordinates.latitude * 1000).truncate().toString() + '_' + (pointCoordinates.longitude * 1000).truncate().toString();
     bool isUpload = true;
-    var nowTime = DateTime.now().millisecondsSinceEpoch;
+    var nowTime = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     var minDist = -1.0;
     var pointCenter = LatLng(0.0, 0.0);
     for (var center in centers) {
-      var radiusCenter = LatLng(int.parse(center.split('_').first) / 10, int.parse(center.split('_').last) / 10);
+      var radiusCenter = LatLng(int.parse(center
+          .split('_')
+          .first) / 10, int.parse(center
+          .split('_')
+          .last) / 10);
       var dist = pow((radiusCenter.latitude - pointCoordinates.latitude), 2) + pow((radiusCenter.longitude - pointCoordinates.longitude), 2);
       if ((minDist == -1.0) || (dist < minDist)) {
         minDist = dist;
@@ -41,7 +49,9 @@ class DbMainMethods {
             confirmsFor: 1,
             confirmsAgainst: 0,
             lastTimeConfirmation: nowTime);
-        globals.userMarkers[newMarker.getMarkerId().value] = newMarker;
+        globals.userMarkers[newMarker
+            .getMarkerId()
+            .value] = newMarker;
         FileOperations.writeUserMarkers();
       }
       newItem.child('coordX').set(pointCoordinates.latitude);
@@ -196,5 +206,24 @@ class DbMainMethods {
         .child(EnumMethods.enumToString(markerInfo.markerType))
         .child(markerInfo.dbMarkerId());
     dbMarker.remove();
+  }
+
+  static Future<void> uploadImage(MarkerInfo markerInfo, File image) async {
+    var firebaseStorageRef = FirebaseStorage.instance
+        .ref()
+        .child(markerInfo.dbCenter() + '/' + EnumMethods.enumToString(markerInfo.markerType) + '/' + markerInfo.dbMarkerId() + '/' + image.path
+        .split('/')
+        .last);
+    firebaseStorageRef.putFile(image);
+  }
+
+  static Future<List<String>> downloadImageUrls(MarkerInfo markerInfo) async {
+
+    getDownloadLinks(List<Reference> refs) => Future.wait(refs.map((e) => e.getDownloadURL()).toList());
+    var firebaseStorageRef = FirebaseStorage.instance
+        .ref(markerInfo.dbCenter() + '/' + EnumMethods.enumToString(markerInfo.markerType) + '/' + markerInfo.dbMarkerId());
+    var res = await firebaseStorageRef.listAll();
+    var urls = await getDownloadLinks(res.items);
+    return urls;
   }
 }
