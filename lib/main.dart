@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
+import 'authenticate/sign_in.dart';
 import 'bottom_bar.dart';
 import 'enums/marker_type.dart';
 import 'local_db/write_in_file.dart';
@@ -53,7 +54,7 @@ class MyApp extends StatelessWidget {
         future: futures,
           builder: (context, futuresSnapshot) {
             if (futuresSnapshot.connectionState != ConnectionState.waiting) {
-              return BottomBar(
+              return SignIn(
                 markers: markers,
                 markersList: markersList,
               );
